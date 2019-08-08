@@ -2,7 +2,7 @@
 
 ### Code of Conduct
 
-Modus has adopted a [Code of Conduct](./CODE_OF_CONDUCT.md) that we expect project participants to adhere to.
+Modus has adopted a [Code of Conduct](CODE_OF_CONDUCT.md) that we expect project participants to adhere to.
 
 ### Submitting a Pull Request
 

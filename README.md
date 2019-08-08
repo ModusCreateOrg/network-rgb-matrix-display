@@ -1,64 +1,103 @@
-# Project Name
 
-[![MIT Licensed](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
-[![Powered by Modus_Create](https://img.shields.io/badge/powered_by-Modus_Create-blue.svg?longCache=true&style=flat&logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIwIDMwMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNOTguODI0IDE0OS40OThjMCAxMi41Ny0yLjM1NiAyNC41ODItNi42MzcgMzUuNjM3LTQ5LjEtMjQuODEtODIuNzc1LTc1LjY5Mi04Mi43NzUtMTM0LjQ2IDAtMTcuNzgyIDMuMDkxLTM0LjgzOCA4Ljc0OS01MC42NzVhMTQ5LjUzNSAxNDkuNTM1IDAgMCAxIDQxLjEyNCAxMS4wNDYgMTA3Ljg3NyAxMDcuODc3IDAgMCAwLTcuNTIgMzkuNjI4YzAgMzYuODQyIDE4LjQyMyA2OS4zNiA0Ni41NDQgODguOTAzLjMyNiAzLjI2NS41MTUgNi41Ny41MTUgOS45MjF6TTY3LjgyIDE1LjAxOGM0OS4xIDI0LjgxMSA4Mi43NjggNzUuNzExIDgyLjc2OCAxMzQuNDggMCA4My4xNjgtNjcuNDIgMTUwLjU4OC0xNTAuNTg4IDE1MC41ODh2LTQyLjM1M2M1OS43NzggMCAxMDguMjM1LTQ4LjQ1OSAxMDguMjM1LTEwOC4yMzUgMC0zNi44NS0xOC40My02OS4zOC00Ni41NjItODguOTI3YTk5Ljk0OSA5OS45NDkgMCAwIDEtLjQ5Ny05Ljg5NyA5OC41MTIgOTguNTEyIDAgMCAxIDYuNjQ0LTM1LjY1NnptMTU1LjI5MiAxODIuNzE4YzE3LjczNyAzNS41NTggNTQuNDUgNTkuOTk3IDk2Ljg4OCA1OS45OTd2NDIuMzUzYy02MS45NTUgMC0xMTUuMTYyLTM3LjQyLTEzOC4yOC05MC44ODZhMTU4LjgxMSAxNTguODExIDAgMCAwIDQxLjM5Mi0xMS40NjR6bS0xMC4yNi02My41ODlhOTguMjMyIDk4LjIzMiAwIDAgMS00My40MjggMTQuODg5QzE2OS42NTQgNzIuMjI0IDIyNy4zOSA4Ljk1IDMwMS44NDUuMDAzYzQuNzAxIDEzLjE1MiA3LjU5MyAyNy4xNiA4LjQ1IDQxLjcxNC01MC4xMzMgNC40Ni05MC40MzMgNDMuMDgtOTcuNDQzIDkyLjQzem01NC4yNzgtNjguMTA1YzEyLjc5NC04LjEyNyAyNy41NjctMTMuNDA3IDQzLjQ1Mi0xNC45MTEtLjI0NyA4Mi45NTctNjcuNTY3IDE1MC4xMzItMTUwLjU4MiAxNTAuMTMyLTIuODQ2IDAtNS42NzMtLjA4OC04LjQ4LS4yNDNhMTU5LjM3OCAxNTkuMzc4IDAgMCAwIDguMTk4LTQyLjExOGMuMDk0IDAgLjE4Ny4wMDguMjgyLjAwOCA1NC41NTcgMCA5OS42NjUtNDAuMzczIDEwNy4xMy05Mi44Njh6IiBmaWxsPSIjRkZGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz4KPC9zdmc+)](https://moduscreate.com)
+# Network Matrix Display 
 
-Project description - one or two paragraphs. The enemy is dark and creates major problems. The solution is now available and the World can rejoice.
+Network Matrix Display is a set of libraries that allows you create a scalable network of matrix displays using Raspberry Pi Single Board Computers.  It does this by using TCIP/IP as a transport method for the display data and is broken into two discrete sections; Client and Server. 
 
-- [Getting Started](#getting-started)
-- [How it Works](#how-it-works)
-- [Developing](#developing)
-  - [Prerequisites](#prerequisites)
-  - [Testing](#testing)
-  - [Contributing](#contributing)
-- [Modus Create](#modus-create)
-- [License](#license)
+Please refer to our [how it works](./md/How_it_works.md) document for a detailed description of this projects functionality.
 
-# Getting Started
+This project is choc-full of dependencies and is not just for the faint of heart.  It requires you to put in effort to set things up.
 
-{Minimal steps required for a quick software trial.}
+It's worth noting that the scale of [our project](./md/example_project.md) was not the cheapest solution for the desired result.  The purpose of this project was to demonstrate what can be done with a hand full of available parts and open source libraries.  
+For the cheapest solution, we recommend display controllers like [these](https://www.aliexpress.com/item/32922416742.html).
 
-```js
-import { Fantastico } from '@modus/awesome-solution';
+#### Related documents: 
+- [How it works](./md/How_it_works.md)
+- [Client Setup Guide](./md/Client_setup_guide.md)
+- [Server Setup Guide](./md/Server_setup_guide.md)
+- [Display Setup Guide](./md/Display_setup_guide.md)
 
-const amazing = new Fantastico();
+## General requirements 
+- Good knowledge in C++
+- Basic understanding of how RGB Matrices work
+- Parts for your project
 
-export default amazing;
+## Client Requirements:
+- [LibBoost 1.7.0](https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz)
+- [CMake 3.14+](https://github.com/Kitware/CMake/releases/download/v3.14.4/cmake-3.14.4.tar.gz)
+- [SDL2 (optional)](https://www.libsdl.org/download-2.0.php)
+
+## Server Requirements
+- [LibBoost 1.7.0](https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz)
+- [CMake 3.14+](https://github.com/Kitware/CMake/releases/download/v3.14.4/cmake-3.14.4.tar.gz)
+- [rpi-rgb-led-matrix library](https://github.com/hzeller/rpi-rgb-led-matrix)
+- [DietPi or similar light-weight linux distribution](https://dietpi.com/)
+- [Raspberry Pi 2 or greater SBC](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
+- [Electro Dragon RGB Panel driver board](https://www.electrodragon.com/product/rgb-matrix-panel-drive-board-raspberry-pi/) (*recommended*)
+- [1+ RGB Matrices](https://www.adafruit.com/product/420)
+
+## Additional hardware
+- For Full Motion video, GigaBit Network switch
+- For low-framerate animations or periodic switches to static images, WIFI is fine
+- Frame for your matrix
+- Power supplies for your SBCs
+- Power supply for your RGB Matrix
+
+
+
+## Client example.
+The following example will generate the proper network display client configuration and kick off 
+```
+  NetworkDisplayConfig displayConfig;
+
+  displayConfig.frameRate = 60; // -1 to disable
+
+  // This is your source display dimensions
+  displayConfig.inputScreenWidth = 320;
+  displayConfig.inputScreenHeight = 240;
+
+  // Dimensions for your panels
+  displayConfig.singlePanelWidth = 64;
+  displayConfig.singlePanelHeight = 64;
+
+  // How you will lay out your segments
+  displayConfig.segmentPanelsTall = 3;
+  displayConfig.segmentPanelsWide = 1;
+
+  // How you will lay out your panels per segment
+  displayConfig.totalPanelsWide = 5;
+  displayConfig.totalPanelsTall = 3;
+
+  displayConfig.totalSegments = 5;
+
+  displayConfig.destinationPort = "9890";
+  
+  // In this scheme, the last IP address octet rolls up for multiple segments. 
+  // Segment 1 is 201, segment 2 is 202, etc..
+  displayConfig.destinationIP = "10.0.1.20%i";
+  displayConfig.destinationIpStartDigit = 1;
+
+  displayConfig.outputScreenWidth = displayConfig.singlePanelWidth * displayConfig.totalPanelsWide;
+  displayConfig.outputScreenHeight = displayConfig.singlePanelHeight * displayConfig.totalPanelsTall;
+
+  NetworkDisplay *networkDisplay = new NetworkDisplay(displayConfig);
+
+  std::thread(interrupterThread).detach();
+
+  uint16_t color = 0;
+  while (! interrupt_received) {
+    // Your code could easily populate the input buffer (array of uint16_t) with the pixel data
+    memset(networkDisplay->GetInputBuffer(), color += 1, networkDisplay->GetInputBufferSize());
+    
+    // Flush the display buffer to the network
+    networkDisplay->Update();
+  }
 ```
 
-# How it works
+## License
+This library is licensed under [MIT](./LICENSE).
 
-{Describe how it works. Include images if possible.}
+# Contributing
+Interested in contributing? Please see our [contribution](./CONTRIBUTING.md) and [code of conduct](./CODE_OFCONDUCT.md) guidelines. 
 
-# Developing
 
-{Show how engineers can set up a development environment and contribute.}
-
-## Prerequisites
-
-{Explain the prerequisites}
-
-## Testing
-
-{Notes on testing}
-
-## Contributing
-
-{How can the community contribute}
-
-# Modus Create
-
-{replace PROJECT_NAME in links below with the name of this project}
-
-[Modus Create](https://moduscreate.com) is a digital product consultancy. We use a distributed team of the best talent in the world to offer a full suite of digital product design-build services; ranging from consumer facing apps, to digital migration, to agile development training, and business transformation.
-
-<a href="https://moduscreate.com/?utm_source=labs&utm_medium=github&utm_campaign=PROJECT_NAME"><img src="https://res.cloudinary.com/modus-labs/image/upload/h_80/v1533109874/modus/logo-long-black.svg" height="80" alt="Modus Create"/></a>
-<br />
-
-This project is part of [Modus Labs](https://labs.moduscreate.com/?utm_source=labs&utm_medium=github&utm_campaign=PROJECT_NAME).
-
-<a href="https://labs.moduscreate.com/?utm_source=labs&utm_medium=github&utm_campaign=PROJECT_NAME"><img src="https://res.cloudinary.com/modus-labs/image/upload/h_80/v1531492623/labs/logo-black.svg" height="80" alt="Modus Labs"/></a>
-
-# Licensing
-
-This project is [MIT licensed](./LICENSE).
+[![Modus Create](./md/img/modus.logo.svg)](https://moduscreate.com)

@@ -1,6 +1,11 @@
+#
+
+This is in progress and not ready for public consumption
+
+
 
 # Developing
-This document's purpose is to provide a high-level understanding of how Genus work. Programmers wishing to get involved should review our [contributions](./CONTRIBUTING.md) guidelines as well as have a decent understanding of C++ and build tools. Having some knowledge of SOCs, such as the [ESP32-WROVER](https://docs.espressif.com/projects/esp-idf/en/3.2/get-started/get-started-wrover-kit.html) would also be very helpful. 
+This document's purpose is to provide a high-level understanding of how Genus work. Programmers wishing to get involved should review our [contributions](../CONTRIBUTING.md) guidelines as well as have a decent understanding of C++ and build tools. Having some knowledge of SOCs, such as the [ESP32-WROVER](https://docs.espressif.com/projects/esp-idf/en/3.2/get-started/get-started-wrover-kit.html) would also be very helpful. 
 
 *Note* We've standardized on ESP-IDF version 3.2:
 https://github.com/espressif/esp-idf/releases/tag/v3.2

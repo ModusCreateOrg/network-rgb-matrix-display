@@ -8,7 +8,7 @@ This library is designed for speed and thus does not use encryption by client or
 ## Client & Server definition
 A `Client` is responsible for generating the display data that will be sent to one or more `Servers` to display via their connected RGB Matrix panels. Utilizing this code base, there is only a single client and there can be on or more servers.
 
-For networking, this project makes heavy use of [Boost ASIO library](https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio.html) and [Hennen Zeller's](https://github.com/hzeller) [rpi-rgb-led-matrix library](https://github.com/hzeller/rpi-rgb-led-matrix) (server only).
+For networking, this project makes heavy use of [Boost ASIO library](https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio.html) and [Henner Zeller's](https://github.com/hzeller) [rpi-rgb-led-matrix library](https://github.com/hzeller/rpi-rgb-led-matrix) (server only).
 
 *Note*: For speed and simplicity, the client and server code do not implement any sort of security (encryption, authentication, tokens, etc..) what-so-ever! It is advised that you execute this in environments with physical network separation from the internet!
 
@@ -65,9 +65,9 @@ Other examples include our [LaiNES emulator](https://github.com/jaygarcia/LaiNES
 
 ## Panel data wiring guide
 
-Hennen has a great [wiring guide](https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/wiring.md) in his repository and it's worth reading.  It's very detailed, but it helps you wrap your mind around how the Pi is able to display data on the matrices. 
-![Hennen's wiring guide image](../server/rpi-rgb-led-matrix/img/coordinates.png)
-**(Hennen's wiring guide image)*
+Henner has a great [wiring guide](https://github.com/hzeller/rpi-rgb-led-matrix/blob/master/wiring.md) in his repository and it's worth reading.  It's very detailed, but it helps you wrap your mind around how the Pi is able to display data on the matrices. 
+![Henner's wiring guide image](../server/rpi-rgb-led-matrix/img/coordinates.png)
+**(Henner's wiring guide image)*
 
 If you're going run parallel chains of matrices, they must be a multiple of that parallel chain. In other words, if you're doing three parallel chains of matrices, you cannot have five total RGB Matrices.
 
