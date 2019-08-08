@@ -4,11 +4,11 @@
  * All color processing should be done via the NetworkServer class.
  */
 
-#include "MatrixStrip.h"
+#include "MatrixSegment.h"
 #include "unistd.h"
 
 
-MatrixStrip::MatrixStrip(RGBMatrix *m) : ThreadedCanvasManipulator(m), mMatrix(m)  {
+MatrixSegment::MatrixSegment(RGBMatrix *m) : ThreadedCanvasManipulator(m), mMatrix(m)  {
 #ifdef __linux__
   pthread_mutex_destroy(&mMutex);
   pthread_mutex_init(&mMutex, nullptr);
@@ -32,7 +32,7 @@ MatrixStrip::MatrixStrip(RGBMatrix *m) : ThreadedCanvasManipulator(m), mMatrix(m
 }
 static uint16_t msColor = 0;
 
-void MatrixStrip::Run() {
+void MatrixSegment::Run() {
 
   volatile uint32_t currentFrameCount = 0;
 
@@ -60,7 +60,7 @@ void MatrixStrip::Run() {
 }
 
 // Used for debug purposes only.
-void MatrixStrip::Describe() {
+void MatrixSegment::Describe() {
   printf("MatrixStrip %p\n", this);
 
   printf("\tmTotalPixels = %lu\n", mTotalPixels);

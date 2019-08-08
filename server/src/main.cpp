@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "NetworkServer.h"
-#include "MatrixStrip.h"
+#include "MatrixSegment.h"
 
 using std::min;
 using std::max;
@@ -59,7 +59,7 @@ double priorAverage = 0;
 int retries = 0;
 
 bool shouldQuit = false;
-MatrixStrip *matrixStrip = NULL;
+MatrixSegment *matrixStrip = NULL;
 
 // This function will loop and help exit gracefully if an interrupt is received.
 void interrupterThread() {
@@ -75,7 +75,7 @@ void interrupterThread() {
 
     if (server->mAverage == priorAverage) {
       retries ++;
-      if (retries > 10) {
+      if (retries > 1) {
         server->mAverage = 0;
         retries = 0;
         matrixStrip->ClearBuffers();
@@ -96,7 +96,8 @@ void interrupterThread() {
 void start_matrix() {
 
   RGBMatrix::Options matrix_options;
-  rgb_matrix::RuntimeOptions runtime_opt;
+
+
 
   // I hard coded options here. You'll need to change this per your own specs!
   matrix_options.chain_length = numMatricesWide;
@@ -106,8 +107,11 @@ void start_matrix() {
   // 0 progressive, 1 interlaced
 //  matrix_options.scan_mode = 1;
   matrix_options.show_refresh_rate = true;
-  matrix_options.pwm_dither_bits = 2;
   matrix_options.pwm_bits = 4;
+
+  rgb_matrix::RuntimeOptions runtime_opt;
+  runtime_opt.gpio_slowdown = 3;
+
 
 
   RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
@@ -119,7 +123,7 @@ void start_matrix() {
   printf("Size: %dx%d. Hardware gpio mapping: %s\n",
          matrix->width(), matrix->height(), matrix_options.hardware_mapping);
 
-  matrixStrip = new MatrixStrip(matrix);
+  matrixStrip = new MatrixSegment(matrix);
   matrixStrip->mTotalPixels = totalPixels;
 
   matrixStrip->Start();

@@ -13,10 +13,10 @@
 using namespace rgb_matrix;
 
 
-class MatrixStrip : public ThreadedCanvasManipulator  {
+class MatrixSegment : public ThreadedCanvasManipulator  {
 
 public:
-  explicit MatrixStrip(RGBMatrix *m);
+  explicit MatrixSegment(RGBMatrix *m);
 
   void Run() override;
 
@@ -57,6 +57,7 @@ public:
 //  printf("MatrixStrip::%s\n", __FUNCTION__);fflush(stdout);
     pthread_mutex_unlock(&mMutex);
   }
+
 
   void ClearBuffers() {
 //    printf("%s\n", __FUNCTION__); fflush(stdout);

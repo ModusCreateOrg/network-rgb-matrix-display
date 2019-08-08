@@ -11,7 +11,7 @@
 #include <time.h>
 
 #include <thread>
-#include "MatrixStrip.h"
+#include "MatrixSegment.h"
 
 using boost::asio::ip::tcp;
 
@@ -23,7 +23,7 @@ struct NetworkServerConfig {
   uint8_t numPanelsTall;
   uint8_t segmentId;
   uint16_t incomingPort;
-  MatrixStrip *matrixStripInstance;
+  MatrixSegment *matrixStripInstance;
 };
 
 class NetworkServer {
@@ -95,7 +95,7 @@ private:
   pthread_mutex_t mMutex;
   std::thread mThread;
 
-  MatrixStrip *mMatrixStrip;
+  MatrixSegment *mMatrixStrip;
 };
 
 
