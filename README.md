@@ -97,7 +97,7 @@ The following example will generate the proper network display client configurat
 This library is licensed under [MIT](./LICENSE).
 
 # Contributing
-Interested in contributing? Please see our [contribution](./CONTRIBUTING.md) and [code of conduct](./CODE_OFCONDUCT.md) guidelines. 
+Interested in contributing? Please see our [contribution](.github/CONTRIBUTING.md) and [code of conduct](.github/CODE_OFCONDUCT.md) guidelines. 
 
 
 [![Modus Create](./md/img/modus.logo.svg)](https://moduscreate.com)
