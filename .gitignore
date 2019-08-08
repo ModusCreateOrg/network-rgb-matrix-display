@@ -25,3 +25,8 @@ node_modules
 # yarn.lock
 
 ## Project-specific files
+cmake-build*
+build/
+.idea/
+.DS_Store
+.git
