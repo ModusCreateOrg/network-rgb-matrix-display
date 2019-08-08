@@ -5,6 +5,22 @@ project(matrix-server)
 
 set(CMAKE_CXX_STANDARD 14)
 
+EXECUTE_PROCESS(
+  COMMAND bash ${CMAKE_SOURCE_DIR}/get_pi_model.sh
+  OUTPUT_VARIABLE PI_VERSION
+)
+
+IF(${PI_VERSION} MATCHES "4")
+  MESSAGE("Found Pi 4")
+
+  ADD_COMPILE_DEFINITIONS(__MODUS_PI_VERSION_4__ true)
+ELSEIF(${PI_VERSION} MATCHES "3")
+  MESSAGE("Found Pi 3")
+  ADD_COMPILE_DEFINITIONS(__MODUS_PI_VERSION_3__ true)
+ELSE()
+  MESSAGE("IDFK WHAT!")
+ENDIF()
+
 # external libraries
 INCLUDE(FindPkgConfig)
 

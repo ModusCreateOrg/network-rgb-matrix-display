@@ -107,11 +107,22 @@ void start_matrix() {
   // 0 progressive, 1 interlaced
 //  matrix_options.scan_mode = 1;
   matrix_options.show_refresh_rate = true;
+#ifdef __MODUS_PI_VERSION_3__
   matrix_options.pwm_bits = 4;
+#endif
+
+#ifdef __MODUS_PI_VERSION_4__
+  matrix_options.pwm_bits = 4;
+#endif
+
 
   rgb_matrix::RuntimeOptions runtime_opt;
-  runtime_opt.gpio_slowdown = 3;
 
+  // Detect raspberry pi 4 & slow down GPIO
+#ifdef __MODUS_PI_VERSION_4__
+  printf("Raspberry Pi 4 detected!\n");
+  runtime_opt.gpio_slowdown = 3;
+#endif
 
 
   RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
