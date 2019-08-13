@@ -25,9 +25,10 @@ file(
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 
 
-
+#SET(DEBUG_USE_SDL_WINDOW=true)
 # Direct linux controls (non-SDL2!)
-if (DEFINED ENV{DEBUG_USE_SDL_WINDOW})
+#if (DEFINED ENV{DEBUG_USE_SDL_WINDOW})
+if (1)
     ADD_COMPILE_DEFINITIONS(__USE_SDL2_VIDEO__=true)
     # CMake Module path (additional cmake files via find_package)
 

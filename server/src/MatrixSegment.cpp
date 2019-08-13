@@ -44,7 +44,7 @@ void MatrixSegment::Run() {
       currentFrameCount = mFrameCount;
     }
     else {
-      usleep(100);
+      usleep(1000);
     }
 
 //    uint8_t r = (msColor & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000

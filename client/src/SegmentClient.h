@@ -16,10 +16,6 @@ struct SegmentClientConfig {
 
 class SegmentClient {
 public:
-  explicit SegmentClient(struct SegmentClientConfig config);
-
-  ~SegmentClient();
-
   uint8_t  mSegmentId;
   uint16_t mSinglePanelWidth;
   uint16_t mSinglePanelHeight;
@@ -42,6 +38,10 @@ public:
   char *mDestinationPort;
 
 
+public:
+  explicit SegmentClient(struct SegmentClientConfig config);
+
+  ~SegmentClient();
 
   void SendDataThread(SegmentClient *mySegment);
 

@@ -49,7 +49,7 @@ SegmentClient::SegmentClient(struct SegmentClientConfig config) {
 }
 
 //uint16_t  color = 0;
-
+//float color = 0;
 void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 //  if (mSegmentId != 1) {
 //    return;
@@ -63,10 +63,9 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
   while (mySegment->GetThreadRunning()) {
 //    printf("segment %i :: SendData()\n", mSegmentId);
-//    color++;
+//    color += .001f;
 
     if (mySegment->GetFrameCount() == currentFrame) {
-//      printf("NetworkDisplay sleeping... %i | %i\n", mySegment->GetFrameCount(), currentFrame);
       usleep(50);
       continue;
     }
@@ -86,9 +85,7 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
       mySegment->LockMutex();
       uint16_t *sBuffPtr = mySegment->GetOutputBuffer();
 
-//      for (int i = 0; i < mySegment->mTotalPixels; i++) {
-//        data[i] = color;
-//      }
+//      memset(data, (uint16_t)color, mySegment->mTotalBytes);
       memcpy(data, sBuffPtr, mySegment->mTotalBytes);
       mySegment->UnlockMutex();
 
@@ -131,7 +128,6 @@ void SegmentClient::StopThread() {
     mThread.join();
   }
   usleep(100);
-
 }
 
 void SegmentClient::LockMutex() {
@@ -148,15 +144,15 @@ void SegmentClient::UnlockMutex() {
 void SegmentClient::Describe() {
   printf("SegmentClient %p\n", this);
   printf("\tmSegmentId = %i\n", mSegmentId);
-//  printf("\tmSinglePanelWidth = %i\n", mSinglePanelWidth);
-//  printf("\tmSinglePanelHeight = %i\n", mSinglePanelHeight);
-//  printf("\tmPixelsPerPanel = %i\n", mPixelsPerPanel);
-//  printf("\tmSegmentWidth = %i\n", mSegmentWidth);
-//  printf("\tmSegmentHeight = %i\n", mSegmentHeight);
-//  printf("\tmMatricesWide = %i\n", mPanelsWide);
-//  printf("\tmMatricesTall = %i\n", mPanelsTall);
-//  printf("\tmTotalPixels = %i\n", mTotalPixels);
-//  printf("\tmTotalBytes = %lu\n", mTotalBytes);
+  printf("\tmSinglePanelWidth = %i\n", mSinglePanelWidth);
+  printf("\tmSinglePanelHeight = %i\n", mSinglePanelHeight);
+  printf("\tmPixelsPerPanel = %i\n", mPixelsPerPanel);
+  printf("\tmSegmentWidth = %i\n", mSegmentWidth);
+  printf("\tmSegmentHeight = %i\n", mSegmentHeight);
+  printf("\tmMatricesWide = %i\n", mPanelsWide);
+  printf("\tmMatricesTall = %i\n", mPanelsTall);
+  printf("\tmTotalPixels = %i\n", mTotalPixels);
+  printf("\tmTotalBytes = %lu\n", mTotalBytes);
   printf("\tmDestinationIP = %s\n", mDestinationIP);
   printf("\tmDestinationPort = %s\n", mDestinationPort);
   fflush(stdout);
@@ -164,6 +160,7 @@ void SegmentClient::Describe() {
 
 SegmentClient::~SegmentClient() {
   StopThread();
+
 
   delete mSegmentBuffer1;
   delete mSegmentBuffer2;

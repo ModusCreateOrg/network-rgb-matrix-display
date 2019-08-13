@@ -86,7 +86,7 @@ void interrupterThread() {
 
     priorAverage = server->mAverage;
 //    server->UnlockMutex();
-    usleep(50000);
+    usleep(5000000);
   }
 }
 
@@ -98,7 +98,6 @@ void start_matrix() {
   RGBMatrix::Options matrix_options;
 
 
-
   // I hard coded options here. You'll need to change this per your own specs!
   matrix_options.chain_length = numMatricesWide;
   matrix_options.cols = singlePanelWidth;
@@ -108,11 +107,11 @@ void start_matrix() {
 //  matrix_options.scan_mode = 1;
   matrix_options.show_refresh_rate = true;
 #ifdef __MODUS_PI_VERSION_3__
-  matrix_options.pwm_bits = 4;
+  matrix_options.pwm_bits = 8;
 #endif
 
 #ifdef __MODUS_PI_VERSION_4__
-  matrix_options.pwm_bits = 4;
+  matrix_options.pwm_bits = 8;
 #endif
 
 

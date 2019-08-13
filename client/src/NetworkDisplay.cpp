@@ -9,11 +9,9 @@
 #include "NetworkDisplay.h"
 
 
-
-
-NetworkDisplay::NetworkDisplay(NetworkDisplayConfig aConfig) {
-  mConfig = aConfig;
-
+NetworkDisplay::NetworkDisplay( NetworkDisplayConfig config) {
+  mConfig = config;
+  mTotalOutputPixels = 0;
 
 #ifdef __linux__
   pthread_mutex_destroy(&mMutex);
@@ -23,30 +21,33 @@ NetworkDisplay::NetworkDisplay(NetworkDisplayConfig aConfig) {
   InitNetworkSegments();
 
   mFrameCount = 0;
-  mFrameRate = aConfig.frameRate;
+  mFrameRate = config.frameRate;
 
-  mInputBufferSize =  aConfig.inputScreenWidth * aConfig.inputScreenHeight * sizeof(uint16_t);
+
+  mInputScreenWidth = config.inputScreenWidth;
+  mInputScreenHeight = config.inputScreenHeight;
+  mTotalInputPixels = mInputScreenWidth * mInputScreenHeight;
+  mInputBufferSize =  mTotalInputPixels * sizeof(uint16_t);
   mInputBuffer1 = (uint16_t *)malloc(mInputBufferSize);
   mInputBuffer2 = (uint16_t *)malloc(mInputBufferSize);
   mCurrInBuffer = mInputBuffer1;
+
 
   mOutputBufferSize = mTotalOutputPixels * sizeof(uint16_t);
   mOutputBuffer1 = (uint16_t *)malloc(mOutputBufferSize);
   mOutputBuffer2 = (uint16_t *)malloc(mOutputBufferSize);
   mCurrOutBuffer = mOutputBuffer1;
 
-  mSinglePanelWidth = aConfig.singlePanelWidth;
-  mSinglePanelHeight = aConfig.singlePanelHeight;
+  mSinglePanelWidth = config.singlePanelWidth;
+  mSinglePanelHeight = config.singlePanelHeight;
 
-  mInputScreenWidth = aConfig.inputScreenWidth;
-  mInputScreenHeight = aConfig.inputScreenHeight;
-  mTotalInputPixels = mInputScreenWidth * mInputScreenHeight;
 
-  mOutputScreenWidth  = aConfig.totalPanelsWide * aConfig.singlePanelWidth;
-  mOutputScreenHeight = aConfig.totalPanelsTall * aConfig.singlePanelHeight;
+
+  mOutputScreenWidth  = config.totalPanelsWide * config.singlePanelWidth;
+  mOutputScreenHeight = config.totalPanelsTall * config.singlePanelHeight;
 
   mSNow  = Milliseconds();
-  mSNext = mSNow + 1000 / aConfig.frameRate;
+  mSNext = mSNow + 1000 / config.frameRate;
 
   StartThread();
 
@@ -60,6 +61,7 @@ NetworkDisplay::NetworkDisplay(NetworkDisplayConfig aConfig) {
 
 void NetworkDisplay::InitNetworkSegments() {
 
+
   int ipFinalDigit = mConfig.destinationIpStartDigit;
 
   for (uint8_t i = 0; i < mConfig.totalSegments ; i++) {
@@ -72,42 +74,43 @@ void NetworkDisplay::InitNetworkSegments() {
     segmentConfig.numPanelsWide =  mConfig.segmentPanelsWide;
     segmentConfig.numPanelsTall = mConfig.segmentPanelsTall;
 
+
     segmentConfig.destinationPort = mConfig.destinationPort;
 
     char *destinationIp = (char *)malloc(strlen(mConfig.destinationIP));
     sprintf(destinationIp, mConfig.destinationIP, ipFinalDigit++);
     segmentConfig.destinationIP = destinationIp;
 
-    mTotalOutputPixels += (segmentConfig.singlePanelWidth * segmentConfig.singlePanelHeight)
-            * segmentConfig.numPanelsWide * segmentConfig.numPanelsTall;
+    mTotalOutputPixels += (segmentConfig.singlePanelWidth * segmentConfig.singlePanelHeight) * segmentConfig.numPanelsWide * segmentConfig.numPanelsTall;
 
     auto *segment = new SegmentClient(segmentConfig);
     mSegments.push_back(segment);
 
     segment->StartThread();
   }
+
+  DescribeSegments();
 }
 
 
 
-void NetworkDisplay::SegmentBufferRunLoop(NetworkDisplay *aRemoteDisplay) {
+void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
   uint16_t currentFrame = 0;
   uint16_t smallerSceen = mInputScreenWidth < mOutputScreenWidth ? mInputScreenWidth : mOutputScreenWidth;
 
-  while (aRemoteDisplay->GetThreadRunnning()) {
+  while (remoteDisplay->GetThreadRunnning()) {
 
-    // Nothing has changed. Sleep a little.
-    if (aRemoteDisplay->GetFrameCount() == currentFrame) {
+    if (remoteDisplay->GetFrameCount() == currentFrame) {
       usleep(100);
       continue;
     }
 
 
-    for (int segmentIdx = 0; segmentIdx < aRemoteDisplay->mSegments.size(); segmentIdx++) {
-      SegmentClient *segment = aRemoteDisplay->mSegments[segmentIdx];
+    for (int segmentIdx = 0; segmentIdx < remoteDisplay->mSegments.size() - 1; segmentIdx++) {
+      SegmentClient *segment = remoteDisplay->mSegments[segmentIdx];
 
       segment->LockMutex();
-
+//      bzero(segment->GetInputBuffer(), segment->mTotalBytes);
       uint16_t startX = segmentIdx * segment->mSegmentWidth;
 
       for (uint16_t y = 0; y < segment->mSegmentHeight; y++) {
@@ -122,15 +125,19 @@ void NetworkDisplay::SegmentBufferRunLoop(NetworkDisplay *aRemoteDisplay) {
       segment->IncrementFrameCount();
     }
 
+    currentFrame = remoteDisplay->GetFrameCount();
+
   }
 
-  printf("NetworkDisplay::SegmentBufferRunLoop ended\n");
+  printf("NetworkDisplay::ThreadFunction ended\n");
 }
-
-
+//uint3232_t  color = 0;
 void NetworkDisplay::Update() {
+//  SwapBuffers();
+//  printf("frame  %i\n", mFrameCount);
   LockMutex();
 
+  bzero(mCurrOutBuffer, mOutputBufferSize);
   size_t smallerBuffer = (mInputBufferSize < mOutputBufferSize) ? mInputBufferSize : mOutputBufferSize;
   memcpy(mCurrOutBuffer, mCurrInBuffer, smallerBuffer);
 
@@ -147,6 +154,16 @@ void NetworkDisplay::Update() {
 
 
 
+void NetworkDisplay::DescribeSegments() {
+  printf("I have %lu segments!\n", mSegments.size());
+  for (int i = 0; i < mSegments.size(); i++) {
+    mSegments[i]->Describe();
+  }
+}
+
+uint16_t *NetworkDisplay::GetInputBuffer() {
+  return mCurrInBuffer;
+}
 
 
 NetworkDisplay::~NetworkDisplay() {
