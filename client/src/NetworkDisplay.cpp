@@ -28,6 +28,7 @@ NetworkDisplay::NetworkDisplay( NetworkDisplayConfig config) {
   mInputScreenHeight = config.inputScreenHeight;
   mTotalInputPixels = mInputScreenWidth * mInputScreenHeight;
   mInputBufferSize =  mTotalInputPixels * sizeof(uint16_t);
+
   mInputBuffer1 = (uint16_t *)malloc(mInputBufferSize);
   mInputBuffer2 = (uint16_t *)malloc(mInputBufferSize);
   mCurrInBuffer = mInputBuffer1;

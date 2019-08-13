@@ -75,6 +75,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
     nColor = random() & UINT16_MAX;
 
     try {
+      nColor++;
       start = clock();
 
       boost::system::error_code error;
@@ -140,7 +141,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 
 
 
-
+      // this thing re-orients the data so that the pixels are mapped vertically
       if (numBytesReceived == mTotalBytes) {
         end = clock();
 
@@ -153,14 +154,20 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 //        uint8_t r = (nColor & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
 //        uint8_t g = (nColor & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
 //        uint8_t b = (nColor & 0x1F) << 3;         // ............bbbbb -> bbbbb000
-//        mMatrixStrip->GetDisplayCanvas()->Fill(r,g,b);
+//        printf("Here\n");
+//        mMatrixStrip->GetRenderCanvas()->Fill(r,g,b);
+//        mMatrixStrip->mFrameCount++;
+//
+//        break;
+
+
         int ptrIndex = mTotalPixels - 1;
         uint16_t *outputBuff = data;
 
         int col = 0;
-        int row = mMatrixStrip->mCanvasWidth;
-        for (; row > 0 ; row--) {
-
+        int row = mMatrixStrip->mCanvasWidth - 1;
+        for (; row > -1 ; row--) {
+//          printf("row %i\n", row);
           col = 0;
           for (; col < mMatrixStrip->mCanvasHeight; col++) {
 

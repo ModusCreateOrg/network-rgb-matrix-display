@@ -86,7 +86,7 @@ void interrupterThread() {
 
     priorAverage = server->mAverage;
 //    server->UnlockMutex();
-    usleep(5000000);
+    usleep(500000);
   }
 }
 
@@ -107,15 +107,21 @@ void start_matrix() {
 //  matrix_options.scan_mode = 1;
   matrix_options.show_refresh_rate = true;
 #ifdef __MODUS_PI_VERSION_3__
-  matrix_options.pwm_bits = 8;
+  matrix_options.pwm_bits = 4;
 #endif
 
 #ifdef __MODUS_PI_VERSION_4__
-  matrix_options.pwm_bits = 8;
+  matrix_options.pwm_bits = 4;
 #endif
 
 
   rgb_matrix::RuntimeOptions runtime_opt;
+
+#ifdef __MODUS_PI_VERSION_3__
+  printf("Raspberry Pi 3 detected!\n");
+  runtime_opt.gpio_slowdown = 3;
+#endif
+
 
   // Detect raspberry pi 4 & slow down GPIO
 #ifdef __MODUS_PI_VERSION_4__

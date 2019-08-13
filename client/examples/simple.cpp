@@ -37,11 +37,11 @@ int main(int argc, char* argv[]) {
   signal(SIGINT, InterruptHandler);
 
   uint16_t screenWidth = 320;
-  uint16_t screenHeight = 240;
+  uint16_t screenHeight = 256;
 
   NetworkDisplayConfig displayConfig;
 
-  displayConfig.frameRate = 5; // -1 to disable
+  displayConfig.frameRate = 60; // -1 to disable
 //  displayConfig.frameRate = -1; // Skip framerate
 
   displayConfig.inputScreenWidth = screenWidth;
@@ -51,8 +51,8 @@ int main(int argc, char* argv[]) {
   displayConfig.singlePanelWidth = 64;
   displayConfig.singlePanelHeight = 64;
 
-  displayConfig.segmentPanelsTall = 1;
-  displayConfig.segmentPanelsWide = 4;
+  displayConfig.segmentPanelsTall = 4;
+  displayConfig.segmentPanelsWide = 5;
 
   displayConfig.totalPanelsWide = 5;
   displayConfig.totalPanelsTall = displayConfig.segmentPanelsTall;
@@ -74,12 +74,14 @@ int main(int argc, char* argv[]) {
   uint32_t color = 0;
 
   while (! interrupt_received) {
-    color++;
+    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
+    color--;
     uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
-//    memset(networkDisplay->GetInputBuffer(), color++, networkDisplay->GetInputBufferSize());
-    for (uint16_t z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
-      inputBuffer[z] = color++;
-    }
+    memset(networkDisplay->GetInputBuffer(), color++, networkDisplay->GetInputBufferSize());
+
+//    for (uint16_t z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
+//      inputBuffer[z] = color++;
+//    }
     printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
     networkDisplay->Update();
   }
