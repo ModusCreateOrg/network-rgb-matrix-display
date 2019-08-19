@@ -16,13 +16,15 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 # Credit to http://stackoverflow.com/a/246128/424301
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BUILD_DIR="$DIR/build"
+BASE_DIR="$DIR/.."
+BUILD_DIR="$BASE_DIR/build"
+SERVER_DIR="$BASE_DIR/server"
 
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
 cd "$BUILD_DIR"
-cmake ..
+cmake "$SERVER_DIR"
 make -j 4
 
 echo "next steps: cd build/"

@@ -16,7 +16,8 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 # Credit to http://stackoverflow.com/a/246128/424301
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BUILD_DIR="$DIR/build"
+BASE_DIR="$DIR/.."
+BUILD_DIR="$BASE_DIR/build"
 
 if [[ ! -f "$BUILD_DIR/build/matrix-server" ]]; then
 	"$DIR/mkbuild.sh"

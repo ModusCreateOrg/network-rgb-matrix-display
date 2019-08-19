@@ -8,7 +8,7 @@ apt-get install g++ vim make libsdl2-dev libsdl2-image-dev rsync git -y
 mkdir -p tmp
 cd tmp
 
-#BOOST 
+#BOOST
 echo "Downloading Lib Boost 1.70.0 ...."
 wget -c https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz -O - | tar -xz
 
@@ -23,14 +23,14 @@ cd boost_1_70_0/
 
 cd ..
 
-cd cmake-3.15.1 
+cd cmake-3.15.1
 ./configure
 make -j 4 install
 cd ../..
 
 rm -rf tmp
 
-# RGB Matrix server stuff. TODO: Move to ModusCreateOrg
+# RGB Matrix server stuff
 git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --recursive-submodules
 
 cd network-rgb-matrix-display/server
