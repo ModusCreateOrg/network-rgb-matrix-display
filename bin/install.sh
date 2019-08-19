@@ -16,7 +16,6 @@ ${DEBUG:-false} && set -vx
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 DIR="/root"
-TMP_DIR="$DIR/tmp"
 
 echo "***** Install core libraries"
 apt-get update -y
@@ -42,6 +41,9 @@ echo "***** Downloading Lib Boost 1.70.0..."
 BOOST_DIR="$TMP_DIR/boost_1_70_0"
 wget -c https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz -O - | tar -xz
 
+echo "***** Downloading CMake..."
+wget -c https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz -O - | tar -xz
+
 echo "***** Compiling Boost..."
 cd "$BOOST_DIR"
 ./bootstrap.sh
@@ -50,17 +52,11 @@ cd "$BOOST_DIR"
 cd "$TMP_DIR"
 rm -rf "$BOOST_DIR"
 
-echo "***** Downloading CMake..."
-cd "$TMP_DIR"
-wget -c https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz -O - | tar -xz
-
 echo "***** Compiling CMake..."
 cd "$TMP_DIR/cmake-3.15.1"
 ./configure
 make -j 4 install
 cd "$DIR"
-
-rm -rf "$TMP_DIR"
 
 echo "**** Cloning network-rgb-matrix-display..."
 # RGB Matrix server stuff
