@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 // Not a pi
 if [[ ! -f /sys/firmware/devicetree/base/model ]]; then 
 	echo -1 

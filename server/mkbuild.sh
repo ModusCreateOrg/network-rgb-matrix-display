@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 rm -rf build/ 2>/dev/null;
 mkdir -p build/
 
