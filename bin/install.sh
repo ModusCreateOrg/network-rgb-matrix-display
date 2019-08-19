@@ -29,7 +29,6 @@ cd "$TMP_DIR"
 
 echo "***** Downloading Lib Boost 1.70.0..."
 BOOST_DIR="$TMP_DIR/1_70_0"
-cd "$TMP_DIR/boost_1_70_0/"
 wget -c https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz -O - | tar -xz
 
 echo "***** Compiling Boost..."
