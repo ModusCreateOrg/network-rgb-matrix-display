@@ -19,10 +19,9 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 # Credit to http://stackoverflow.com/a/246128/424301
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BASE_DIR="$DIR/.."
 
-cd "$BASE_DIR"
-rm -rf build/ 2>/dev/null
+cd "$DIR"
+rm -rf build/
 mkdir -p build/
 
 cd build
