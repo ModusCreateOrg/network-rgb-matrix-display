@@ -76,10 +76,11 @@ void interrupterThread() {
     if (server->mAverage == priorAverage) {
       retries ++;
       if (retries > 1) {
+//        printf("\n**CLEAR BUFFERS!! retries=%i\n",retries);
+
         server->mAverage = 0;
         retries = 0;
         matrixStrip->ClearBuffers();
-//        printf("**CLEAR BUFFERS!! retries=%i\n",retries);
       }
 
     }
@@ -107,7 +108,7 @@ void start_matrix() {
 //  matrix_options.scan_mode = 1;
   matrix_options.show_refresh_rate = true;
 #ifdef __MODUS_PI_VERSION_3__
-  matrix_options.pwm_bits = 4;
+  matrix_options.pwm_bits = 6;
 #endif
 
 #ifdef __MODUS_PI_VERSION_4__
@@ -118,8 +119,8 @@ void start_matrix() {
   rgb_matrix::RuntimeOptions runtime_opt;
 
 #ifdef __MODUS_PI_VERSION_3__
-  printf("Raspberry Pi 3 detected!\n");
-  runtime_opt.gpio_slowdown = 3;
+//  printf("Raspberry Pi 3 detected!\n");
+//  runtime_opt.gpio_slowdown = 3;
 #endif
 
 
