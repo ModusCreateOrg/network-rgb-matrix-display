@@ -58,6 +58,6 @@ git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --rec
 
 echo "**** Installing service..."
 
-"$DIR/bin/install-service.sh"
+"$DIR/network-rgb-matrix-display/bin/install-service.sh"
 
 echo "**** Done"
