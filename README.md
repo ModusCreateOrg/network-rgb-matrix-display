@@ -10,7 +10,7 @@ This project is choc-full of dependencies and is not just for the faint of heart
 It's worth noting that the scale of [our project](./md/example_project.md) was not the cheapest solution for the desired result.  The purpose of this project was to demonstrate what can be done with a hand full of available parts and open source libraries.  
 For the cheapest solution, we recommend display controllers like [these](https://www.aliexpress.com/item/32922416742.html).
 
-#### Related documents: 
+## Related documents: 
 - [How it works](./md/How_it_works.md)
 - [Client Setup Guide](./md/Client_setup_guide.md)
 - [Server Setup Guide](./md/Server_setup_guide.md)
@@ -42,7 +42,10 @@ For the cheapest solution, we recommend display controllers like [these](https:/
 - Power supplies for your SBCs
 - Power supply for your RGB Matrix
 
+## Installation
+Install DietPi on a Raspberry Pi 2 or greater. Make sure it has Internet connectivity. Then run this script to provision the system and install the Network Matrix Display project:
 
+    curl https://raw.githubusercontent.com/ModusCreateOrg/network-rgb-matrix-display/master/bin/install.sh | bash
 
 ## Client example.
 The following example will generate the proper network display client configuration and kick off 
