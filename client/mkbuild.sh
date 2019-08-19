@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 #
-# terraform.sh
+# mkbuild.sh
 #
-# Wrapper script for running Terraform through Docker
-#
-# Useful when running in Jenkins CI or other contexts where you have Docker
-# available.
+# Build the RGB matrix code
 
 # Set bash unofficial strict mode http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
