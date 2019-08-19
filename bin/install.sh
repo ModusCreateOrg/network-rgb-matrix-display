@@ -47,6 +47,7 @@ cd "$BOOST_DIR"
 ./bootstrap.sh
 ./b2 -j4 --with-iostreams --with-thread --with-headers threading=multi install
 # This directory is over 700MB after compiling, remove it to save /tmp space
+cd "$TMP_DIR"
 rm -rf "$BOOST_DIR"
 
 echo "***** Downloading CMake..."
