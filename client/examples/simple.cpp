@@ -30,6 +30,7 @@ void interrupterThread() {
   }
 }
 
+uint32_t color = 0;
 
 
 int main(int argc, char* argv[]) {
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
 
   NetworkDisplayConfig displayConfig;
 
-  displayConfig.frameRate = 60; // -1 to disable
+  displayConfig.frameRate = 20; // -1 to disable
 //  displayConfig.frameRate = -1; // Skip framerate
 
   displayConfig.inputScreenWidth = screenWidth;
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
   displayConfig.singlePanelWidth = 64;
   displayConfig.singlePanelHeight = 64;
 
-  displayConfig.segmentPanelsTall = 4;
+  displayConfig.segmentPanelsTall = 1;
   displayConfig.segmentPanelsWide = 5;
 
   displayConfig.totalPanelsWide = 5;
@@ -71,18 +72,17 @@ int main(int argc, char* argv[]) {
 
 
   std::thread(interrupterThread).detach();
-  uint32_t color = 0;
 
   while (! interrupt_received) {
-    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
-    color--;
+    color += 2;
+//    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
     uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
-    memset(networkDisplay->GetInputBuffer(), color++, networkDisplay->GetInputBufferSize());
+//    memset(networkDisplay->GetInputBuffer(), color++, networkDisplay->GetInputBufferSize());
 
-//    for (uint16_t z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
-//      inputBuffer[z] = color++;
-//    }
-    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
+    for (uint16_t z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
+      inputBuffer[z] = color;
+    }
+//    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
     networkDisplay->Update();
   }
 
