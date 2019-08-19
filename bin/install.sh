@@ -50,6 +50,7 @@ cd "$BOOST_DIR"
 rm -rf "$BOOST_DIR"
 
 echo "***** Downloading CMake..."
+cd "$TMP_DIR"
 wget -c https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz -O - | tar -xz
 
 echo "***** Compiling CMake..."
