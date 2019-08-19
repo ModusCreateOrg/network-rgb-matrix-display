@@ -53,7 +53,7 @@ cd "$DIR"
 rm -rf "$TMP_DIR"
 
 # RGB Matrix server stuff
-git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --recursive-submodules
+git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --recurse-submodules
 
 "$DIR/network-rgb-matrix-display/bin/mkbuild.sh"
 
