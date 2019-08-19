@@ -54,7 +54,9 @@ NetworkServer::NetworkServer(struct NetworkServerConfig config) {
 
   mMatrixStrip = config.matrixStripInstance;
 
+#ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
   Describe();
+#endif
 }
 
 uint16_t nColor = 0;

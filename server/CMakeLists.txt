@@ -21,6 +21,9 @@ ELSE()
   MESSAGE("IDFK WHAT!")
 ENDIF()
 
+
+
+
 # external libraries
 INCLUDE(FindPkgConfig)
 
@@ -31,10 +34,17 @@ INCLUDE_DIRECTORIES(
   ${Boost_INCLUDE_DIR}
 )
 
-#add_compile_definitions(REMOVE_DEPRECATED_TRANSFORMERS true);
+add_compile_definitions(REMOVE_DEPRECATED_TRANSFORMERS true)
 
-#Flip the image viertically
+#Flip the image vertically (Currently unused!)
 add_compile_definitions(__MATRIX_STRIP_BOTTOM_UP__ true)
+
+# Debug messages
+#add_compile_definitions(__MATRIX_SHOW_DEBUG_MESSAGES__ true)
+
+# Run as a daemon
+add_compile_definitions(__MATRIX_RUN_AS_DAEMON__ true)
+
 
 set(MATRIX_SRC_DIR ${CMAKE_SOURCE_DIR}/rpi-rgb-led-matrix/)
 

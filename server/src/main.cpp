@@ -104,19 +104,26 @@ void start_matrix() {
   matrix_options.cols = singlePanelWidth;
   matrix_options.rows = singlePanelHeight;
   matrix_options.parallel = 1;
-  // 0 progressive, 1 interlaced
-//  matrix_options.scan_mode = 1;
+
+#ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
   matrix_options.show_refresh_rate = true;
+#endif
+
 #ifdef __MODUS_PI_VERSION_3__
   matrix_options.pwm_bits = 6;
 #endif
 
 #ifdef __MODUS_PI_VERSION_4__
-  matrix_options.pwm_bits = 4;
+  matrix_options.pwm_bits = 8;
 #endif
 
 
   rgb_matrix::RuntimeOptions runtime_opt;
+
+
+#ifdef __MATRIX_RUN_AS_DAEMON__
+  runtime_opt.daemon = 1;
+#endif
 
 #ifdef __MODUS_PI_VERSION_3__
 //  printf("Raspberry Pi 3 detected!\n");

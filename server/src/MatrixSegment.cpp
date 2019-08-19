@@ -27,8 +27,10 @@ MatrixSegment::MatrixSegment(RGBMatrix *m) : ThreadedCanvasManipulator(m), mMatr
   mCanvasHeight = mRenderCanvas->height();
   mFrameCount = 0;
 
+
+#ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
   Describe();
-  fflush(stdout);
+#endif
 }
 static uint16_t msColor = 0;
 
@@ -50,16 +52,9 @@ void MatrixSegment::Run() {
       currentFrameCount = mFrameCount;
     }
     else {
-      usleep(1000);
+      usleep(100);
     }
 
-//    uint8_t r = (msColor & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
-//    uint8_t g = (msColor & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
-//    uint8_t b = (msColor & 0x1F) << 3;         // ............bbbbb -> bbbbb000
-//    mDisplayCanvas->Fill(r,g,b);
-//    LockMutex();
-//    mDisplayCanvas = mMatrix->SwapOnVSync(mDisplayCanvas);
-//    UnlockMutex();
   }
 
   printf("MatrixStrip::Run() ended!!\n");
