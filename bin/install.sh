@@ -28,18 +28,23 @@ TMP_DIR="$(mktemp -d)"
 cd "$TMP_DIR"
 
 #BOOST
-echo "Downloading Lib Boost 1.70.0 ...."
+BOOST_DIR="$TMP_DIR/1_70_0
+cd "$TMP_DIR/boost_1_70_0/"
+echo "***** Downloading Lib Boost 1.70.0 ...."
 wget -c https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz -O - | tar -xz
 
-echo "Downloading CMake..."
+echo "***** Downloading CMake..."
 wget -c https://github.com/Kitware/CMake/releases/download/v3.15.1/cmake-3.15.1.tar.gz -O - | tar -xz
 
 
-echo "Compiling Boost..."
-cd "$TMP_DIR/boost_1_70_0/"
+echo "***** Compiling Boost..."
+cd "$BOOST_DIR"
 ./bootstrap.sh
 ./b2 -j4 --with-iostreams --with-thread --with-headers threading=multi install
+# This directory is over 700MB after compiling, remove it to save /tmp space
+rm -rf "$BOOST_DIR"
 
+echo "***** Compiling CMake..."
 cd "$TMP_DIR/cmake-3.15.1"
 ./configure
 make -j 4 install
@@ -53,4 +58,3 @@ git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --rec
 "$DIR/network-rgb-matrix-display/bin/mkbuild.sh"
 
 echo "Done"
-#shutdown -h now
