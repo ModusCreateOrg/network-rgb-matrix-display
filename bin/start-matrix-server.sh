@@ -19,7 +19,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$DIR/.."
 BUILD_DIR="$BASE_DIR/build"
 
-if [[ ! -f "$BUILD_DIR/build/matrix-server" ]]; then
+if [[ ! -f "$BUILD_DIR/matrix-server" ]]; then
 	"$DIR/mkbuild.sh"
 fi
 
