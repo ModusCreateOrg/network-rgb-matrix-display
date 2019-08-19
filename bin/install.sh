@@ -15,8 +15,7 @@ ${DEBUG:-false} && set -vx
 # and http://wiki.bash-hackers.org/scripting/debuggingtips
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
-# Credit to http://stackoverflow.com/a/246128/424301
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="/root"
 TMP_DIR="$DIR/tmp"
 
 ## Install core libs
@@ -51,8 +50,7 @@ rm -rf "$TMP_DIR"
 # RGB Matrix server stuff
 git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --recursive-submodules
 
-cd "$DIR/network-rgb-matrix-display/bin"
-./mkbuild.sh
+"$DIR/network-rgb-matrix-display/bin/mkbuild.sh"
 
 echo "Done"
 #shutdown -h now
