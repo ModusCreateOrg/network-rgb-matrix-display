@@ -9,7 +9,7 @@
 #include "NetworkDisplay.h"
 
 
-NetworkDisplay::NetworkDisplay( NetworkDisplayConfig config) {
+NetworkDisplay::NetworkDisplay(NetworkDisplayConfig config) {
   mConfig = config;
   mTotalOutputPixels = 0;
 
@@ -27,6 +27,7 @@ NetworkDisplay::NetworkDisplay( NetworkDisplayConfig config) {
   mInputScreenWidth = config.inputScreenWidth;
   mInputScreenHeight = config.inputScreenHeight;
   mTotalInputPixels = mInputScreenWidth * mInputScreenHeight;
+
   mInputBufferSize =  mTotalInputPixels * sizeof(uint16_t);
 
   mInputBuffer1 = (uint16_t *)malloc(mInputBufferSize);
@@ -53,7 +54,8 @@ NetworkDisplay::NetworkDisplay( NetworkDisplayConfig config) {
   StartThread();
 
 #ifdef __USE_SDL2_VIDEO__
-  mSDL2Display = new SDL2Display(mInputScreenWidth, mInputScreenHeight);
+//  mSDL2Display = new SDL2Display(mInputScreenWidth, mInputScreenHeight);
+  mSDL2Display = new SDL2Display(mOutputScreenWidth, mOutputScreenHeight);
 #endif
 
 
@@ -98,6 +100,8 @@ void NetworkDisplay::InitNetworkSegments() {
 void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
   uint16_t currentFrame = 0;
   uint16_t smallerSceen = mInputScreenWidth < mOutputScreenWidth ? mInputScreenWidth : mOutputScreenWidth;
+
+  printf("Smaller screen is %s\n", (mInputScreenWidth < mOutputScreenWidth) ? "INPUT" : "OUTPUT");
 
   while (remoteDisplay->GetThreadRunnning()) {
 

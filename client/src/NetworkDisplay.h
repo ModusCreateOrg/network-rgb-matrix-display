@@ -139,8 +139,10 @@ private:
 
   std::thread mThread;
 
+
+
   size_t mInputBufferSize;
-  uint16_t mTotalInputPixels;
+  uint32_t mTotalInputPixels;
   uint16_t *mCurrInBuffer;
   uint16_t *mInputBuffer1;
   uint16_t *mInputBuffer2;

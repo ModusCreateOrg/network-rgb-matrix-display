@@ -49,7 +49,7 @@ SegmentClient::SegmentClient(struct SegmentClientConfig config) {
 }
 
 //uint16_t  color = 0;
-//float color = 0;
+float segmentColor = 0;
 void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 //  if (mSegmentId != 1) {
 //    return;
@@ -63,7 +63,7 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
   while (mySegment->GetThreadRunning()) {
 //    printf("segment %i :: SendData()\n", mSegmentId);
-//    color += .001f;
+    segmentColor += .001f;
 
     if (mySegment->GetFrameCount() == currentFrame) {
       usleep(50);
@@ -85,7 +85,9 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
       mySegment->LockMutex();
       uint16_t *sBuffPtr = mySegment->GetOutputBuffer();
 
-//      memset(data, (uint16_t)color, mySegment->mTotalBytes);
+//      memset(data, (uint16_t)segmentColor, mySegment->mTotalBytes);
+
+
       memcpy(data, sBuffPtr, mySegment->mTotalBytes);
       mySegment->UnlockMutex();
 
