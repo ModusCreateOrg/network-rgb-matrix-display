@@ -31,7 +31,7 @@ cd ../..
 rm -rf tmp
 
 # RGB Matrix server stuff. TODO: Move to ModusCreateOrg
-git clone https://github.com/jaygarcia/network-rgb-matrix-display.git
+git clone https://github.com/ModusCreateOrg/network-rgb-matrix-display.git --recursive-submodules
 
 cd network-rgb-matrix-display/server
 ./mkbuild.sh

@@ -47,6 +47,12 @@ Install DietPi on a Raspberry Pi 2 or greater. Make sure it has Internet connect
 
     curl https://raw.githubusercontent.com/ModusCreateOrg/network-rgb-matrix-display/master/bin/install.sh | bash
 
+If you want to perform these steps by hand, be sure to clone the `network-rgb-matrix-display` with the `--recursive --submodules` option.
+
+If you forget to clone it this way, you can fix up your checked out copy by issuing this command:
+
+   git submodule update --init --recursive 
+
 ## Client example.
 The following example will generate the proper network display client configuration and kick off 
 ```
