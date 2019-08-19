@@ -25,10 +25,21 @@ apt-get dist-upgrade -y
 apt-get install g++ vim make libsdl2-dev libsdl2-image-dev rsync git -y
 
 TMP_DIR="$(mktemp -d)"
+function finish {
+    RETCODE=$?
+    if [[ "$RETCODE" -ne 0 ]]; then
+	echo "***** Exiting with return code $RETCODE. Temp dir $TMP_DIR contents:"
+        ls -l "$DIR"  
+    fi
+    rm -rf "$TMP_DIR"
+    return "$RETCODE"
+}
+trap finish EXIT
+
 cd "$TMP_DIR"
 
 echo "***** Downloading Lib Boost 1.70.0..."
-BOOST_DIR="$TMP_DIR/1_70_0"
+BOOST_DIR="$TMP_DIR/boost_1_70_0"
 wget -c https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz -O - | tar -xz
 
 echo "***** Compiling Boost..."
