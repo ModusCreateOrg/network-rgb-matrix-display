@@ -1,0 +1,12 @@
+[Unit]
+Description=Pi Display
+After=network.target
+
+[Service]
+Type=simple
+Forking=true
+Restart=always
+ExecStart=/root/pi-display/network-rgb-matrix-display/server/start-matrix-server.sh
+
+[Install]
+WantedBy=multi-user.target
