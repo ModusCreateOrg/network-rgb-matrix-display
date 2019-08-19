@@ -27,4 +27,10 @@ cd "$BUILD_DIR"
 cmake "$SERVER_DIR"
 make -j 4
 
-echo "next steps: cd build/"
+cat <<EOF
+The software has been built sucesfully.
+Run it in the background by issuing these commands:
+
+   cd "$BUILD_DIR"
+   ./matrix-server
+EOF
