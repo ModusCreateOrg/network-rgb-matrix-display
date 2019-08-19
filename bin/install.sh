@@ -24,7 +24,7 @@ apt-get upgrade -y
 apt-get dist-upgrade -y
 apt-get install g++ vim make libsdl2-dev libsdl2-image-dev rsync git -y
 
-mkdir -p "$TMP_DIR"
+TMP_DIR="$(mktemp -d)"
 cd "$TMP_DIR"
 
 #BOOST
