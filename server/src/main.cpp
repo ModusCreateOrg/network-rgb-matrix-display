@@ -104,17 +104,18 @@ void start_matrix() {
   matrix_options.cols = singlePanelWidth;
   matrix_options.rows = singlePanelHeight;
   matrix_options.parallel = 1;
+//  matrix_options.brightness = 70;
 
 #ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
   matrix_options.show_refresh_rate = true;
 #endif
 
 #ifdef __MODUS_PI_VERSION_3__
-  matrix_options.pwm_bits = 6;
+  matrix_options.pwm_bits = 4;
 #endif
 
 #ifdef __MODUS_PI_VERSION_4__
-  matrix_options.pwm_bits = 8;
+  matrix_options.pwm_bits = 6;
 #endif
 
 
