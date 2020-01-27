@@ -24,7 +24,9 @@
 #include <string.h>
 
 #include "NetworkServer.h"
+#include "NetworkServerConfig.h"
 #include "MatrixSegment.h"
+#include "ini.h"
 
 using std::min;
 using std::max;
@@ -34,15 +36,14 @@ using namespace rgb_matrix;
 
 pthread_mutex_t bufferMutex;
 
-// Change the following constants to your liking. The number of bytes that are sent
-// will need to match readBufferSize!
-const uint16_t singlePanelWidth = 64;
-const uint16_t singlePanelHeight = 64;
-const uint16_t totalSinglePanelSize = (singlePanelHeight * singlePanelWidth);
-const uint16_t numMatricesWide = 4;
-const uint16_t numMatricesTall = 1; // Should be 4!!
-const uint16_t totalPixels = totalSinglePanelSize * numMatricesWide * numMatricesTall;
-const size_t readBufferSize = totalPixels * sizeof(uint16_t);
+
+//const uint16_t singlePanelWidth = 64;
+//const uint16_t singlePanelHeight = 64;
+//const uint16_t totalSinglePanelSize = (singlePanelHeight * singlePanelWidth);
+//const uint16_t numPanelsWide = 4;
+//const uint16_t numPanelsTall = 1; // Should be 4!!
+//const uint16_t totalPixels = totalSinglePanelSize * numPanelsWide * numPanelsTall;
+//const size_t readBufferSize = totalPixels * sizeof(uint16_t);
 
 
 
@@ -94,16 +95,17 @@ void interrupterThread() {
 /***********************************************************************/
 
 
-void start_matrix() {
+void start_matrix(NetworkServerConfig aServerConfig) {
 
   RGBMatrix::Options matrix_options;
 
 
   // I hard coded options here. You'll need to change this per your own specs!
-  matrix_options.chain_length = numMatricesWide;
-  matrix_options.cols = singlePanelWidth;
-  matrix_options.rows = singlePanelHeight;
-  matrix_options.parallel = 1;
+  matrix_options.chain_length = aServerConfig.numPanelsWide;
+  matrix_options.cols = aServerConfig.singlePanelWidth;
+  matrix_options.rows = aServerConfig.singlePanelHeight;
+  matrix_options.parallel = aServerConfig.matrix_options->parallel;
+  // TODO: @jaygarcia generate this with NetworkServerConfig.h
 //  matrix_options.brightness = 70;
 
 #ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
@@ -120,7 +122,6 @@ void start_matrix() {
 
 
   rgb_matrix::RuntimeOptions runtime_opt;
-
 
 #ifdef __MATRIX_RUN_AS_DAEMON__
   runtime_opt.daemon = 1;
@@ -149,17 +150,29 @@ void start_matrix() {
          matrix->width(), matrix->height(), matrix_options.hardware_mapping);
 
   matrixStrip = new MatrixSegment(matrix);
-  matrixStrip->mTotalPixels = totalPixels;
+  matrixStrip->mTotalPixels = aServerConfig.totalPixels;
 
   matrixStrip->Start();
 }
 
 
 
-/**** MAIN *****/
 int main(int argc, char* argv[]) {
   signal(SIGTERM, InterruptHandler);
   signal(SIGINT, InterruptHandler);
+
+
+  for (int i = 0; i < argc; i++) {
+    printf("arg %i\t%s\n", i, argv[i]);
+  };
+
+  if (argc < 2) {
+    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
+    exit(127);
+  }
+
+  NetworkServerConfig serverConfig = NetworkServer::GenerateConfigFromFile(argv[1]);
+
 
 //  printf("Server starting & expecting (%lu bytes)...\n", readBufferSize); fflush(stdout);
   char hostname[1024];
@@ -170,15 +183,9 @@ int main(int argc, char* argv[]) {
   fflush(stdout);
 
 
-  start_matrix();
+  start_matrix(serverConfig);
 
-  NetworkServerConfig serverConfig;
-  serverConfig.incomingPort = 9890;
-  serverConfig.numPanelsWide = numMatricesWide;
-  serverConfig.numPanelsTall = numMatricesTall;
-  serverConfig.singlePanelWidth = singlePanelWidth;
-  serverConfig.singlePanelHeight = singlePanelHeight;
-  serverConfig.segmentId = 1;
+
   serverConfig.matrixStripInstance = matrixStrip;
 
 //  usleep(1000);

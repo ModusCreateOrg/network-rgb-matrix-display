@@ -30,8 +30,12 @@ INCLUDE(FindPkgConfig)
 FIND_PACKAGE(Boost REQUIRED)
 FIND_PACKAGE(Threads REQUIRED)
 
+set(INI_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ini)
+
+
 INCLUDE_DIRECTORIES(
   ${Boost_INCLUDE_DIR}
+  ${INI_LIB_DIR}
 )
 
 add_compile_definitions(REMOVE_DEPRECATED_TRANSFORMERS true)
@@ -46,6 +50,7 @@ add_compile_definitions(__MATRIX_STRIP_BOTTOM_UP__ true)
 add_compile_definitions(__MATRIX_RUN_AS_DAEMON__ true)
 
 
+
 set(MATRIX_SRC_DIR ${CMAKE_SOURCE_DIR}/rpi-rgb-led-matrix/)
 
 # Currently using everything. Compilation is a little slower, we could work to remove items if we wish.
@@ -55,6 +60,7 @@ file(
   ${MATRIX_SRC_DIR}/lib/*.cc
   ${MATRIX_SRC_DIR}/lib/*.c
   ${MATRIX_SRC_DIR}/lib/*.h
+  ${INI_LIB_DIR}/*.c
 )
 
 INCLUDE_DIRECTORIES(${MATRIX_SRC_DIR}/include ${MATRIX_SRC_DIR}/lib)

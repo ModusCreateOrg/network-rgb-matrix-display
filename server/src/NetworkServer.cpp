@@ -17,7 +17,7 @@
 #include <time.h>
 
 #include "NetworkServer.h"
-
+#include "NetworkServerConfig.h"
 
 using boost::asio::ip::tcp;
 using std::min;
@@ -53,6 +53,10 @@ NetworkServer::NetworkServer(struct NetworkServerConfig config) {
   mTotalBytes = mTotalPixels * sizeof(uint16_t);
 
   mMatrixStrip = config.matrixStripInstance;
+
+  mPort = config.port;
+  mIP = strdup(config.ip);
+
 
 #ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
   Describe();
@@ -204,7 +208,7 @@ void NetworkServer::ServerStartingThread() {
   mThreadRunning = true;
 
   boost::asio::io_context io_context;
-  unsigned short port = 9890;
+  unsigned short port = mPort;
   tcp::acceptor a(io_context, tcp::endpoint(tcp::v4(), port));
 
   sched_param sch_params;

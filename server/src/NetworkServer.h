@@ -11,22 +11,29 @@
 #include <time.h>
 
 #include <thread>
-#include "MatrixSegment.h"
-
 using boost::asio::ip::tcp;
 
 
-struct NetworkServerConfig {
-  uint16_t singlePanelWidth;
-  uint16_t singlePanelHeight;
-  uint8_t numPanelsWide;
-  uint8_t numPanelsTall;
-  uint8_t segmentId;
-  uint16_t incomingPort;
-  MatrixSegment *matrixStripInstance;
-};
+#include "MatrixSegment.h"
+#include "NetworkServerConfig.h"
+#include "ini.h"
 
 class NetworkServer {
+public:
+  static NetworkServerConfig GenerateConfigFromFile(const char *aFile) {
+    NetworkServerConfig svrConfig;
+    int error = ini_parse(aFile, ini_file_handler, &svrConfig);
+    if (error != 0) {
+      fprintf(stderr, "Fatal Error: Can't parse %s. Error code %i.\n", aFile, error);
+      fflush(stderr);
+      exit(1);
+    }
+
+    svrConfig.totalSinglePanelSize = svrConfig.singlePanelHeight * svrConfig.singlePanelWidth;
+    svrConfig.totalPixels = svrConfig.totalSinglePanelSize * svrConfig.numPanelsWide * svrConfig.numPanelsTall;
+
+    return svrConfig;
+  }
 public:
   uint8_t  mSegmentId;
   uint16_t mSinglePanelWidth;
@@ -94,6 +101,8 @@ private:
 
   pthread_mutex_t mMutex;
   std::thread mThread;
+  unsigned short mPort;
+  const char *mIP;
 
   MatrixSegment *mMatrixStrip;
 };

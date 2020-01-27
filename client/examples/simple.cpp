@@ -33,13 +33,7 @@ void interrupterThread() {
 
 uint16_t color = random() % UINT16_MAX;
 
-
-
-
-//
-
 int main(int argc, char* argv[]) {
-
 
   for (int i = 0; i < argc; i++) {
     printf("arg %i\t%s\n", i, argv[i]);
@@ -49,8 +43,6 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
     exit(127);
   }
-
-//  const char *file = "/home/jgarcia/projects/pi-display/network-rgb-matrix-display/client/build/test.ini";
 
   NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(argv[1]);
 
