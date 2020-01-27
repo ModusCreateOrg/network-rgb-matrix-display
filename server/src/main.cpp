@@ -9,19 +9,13 @@
 #include <iostream>
 #include <thread>
 #include <utility>
-#include <boost/asio.hpp>
-#include <cstring>
 #include <pthread.h>
-#include <time.h>
 
 #include "led-matrix.h"
-#include "pixel-mapper.h"
 #include "graphics.h"
 
-#include <assert.h>
 #include <getopt.h>
 #include <signal.h>
-#include <string.h>
 
 #include "NetworkServer.h"
 #include "NetworkServerConfig.h"
@@ -112,33 +106,35 @@ void start_matrix(NetworkServerConfig aServerConfig) {
   matrix_options.show_refresh_rate = true;
 #endif
 
-#ifdef __MODUS_PI_VERSION_3__
-  matrix_options.pwm_bits = 4;
-#endif
-
-#ifdef __MODUS_PI_VERSION_4__
-  matrix_options.pwm_bits = 6;
-#endif
+// These come from ini file moving fwd.
+//#ifdef __MODUS_PI_VERSION_3__
+//  matrix_options.pwm_bits = 4;
+//#endif
+//
+//#ifdef __MODUS_PI_VERSION_4__
+//  matrix_options.pwm_bits = 6;
+//#endif
 
 
   rgb_matrix::RuntimeOptions runtime_opt;
-
-#ifdef __MATRIX_RUN_AS_DAEMON__
-  runtime_opt.daemon = 1;
-#endif
-
-#ifdef __MODUS_PI_VERSION_3__
-//  printf("Raspberry Pi 3 detected!\n");
+// These come from ini file moving fwd.
+//
+//#ifdef __MATRIX_RUN_AS_DAEMON__
+//  runtime_opt.daemon = 1;
+//#endif
+//
+//#ifdef __MODUS_PI_VERSION_3__
+////  printf("Raspberry Pi 3 detected!\n");
+////  runtime_opt.gpio_slowdown = 3;
+//#endif
+//
+//
+//  // Detect raspberry pi 4 & slow down GPIO
+//#ifdef __MODUS_PI_VERSION_4__
+//  printf("Raspberry Pi 4 detected!\n");
 //  runtime_opt.gpio_slowdown = 3;
-#endif
-
-
-  // Detect raspberry pi 4 & slow down GPIO
-#ifdef __MODUS_PI_VERSION_4__
-  printf("Raspberry Pi 4 detected!\n");
-  runtime_opt.gpio_slowdown = 3;
-#endif
-
+//#endif
+//
 
   RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
   if (matrix == NULL) {
