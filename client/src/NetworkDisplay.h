@@ -10,34 +10,26 @@
 #include "SegmentClient.h"
 #include "SDL2Display.h"
 
-struct NetworkDisplayConfig {
-  size_t   inputBufferSize;
-
-  uint16_t inputScreenWidth;
-  uint16_t inputScreenHeight;
-
-  uint16_t outputScreenWidth;
-  uint16_t outputScreenHeight;
-
-  uint16_t singlePanelHeight;
-  uint16_t singlePanelWidth;
-
-  uint16_t totalPanelsWide;
-  uint16_t totalPanelsTall;
-
-  uint8_t totalSegments;
-  int frameRate;
-
-  uint8_t segmentPanelsTall;
-  uint8_t segmentPanelsWide;
-
-  char *destinationPort;
-  char *destinationIP;
-  uint8_t destinationIpStartDigit;
-};
+#include "NetworkDisplayConfig.h"
 
 class NetworkDisplay {
+public:
+  static NetworkDisplayConfig GenerateConfig(const char *aFile) {
+    NetworkDisplayConfig displayConfig;
 
+    int error = ini_parse(aFile, ini_file_handler, &displayConfig);
+    if (error != 0) {
+      fprintf(stderr, "Fatal Error: Can't parse %s. Error code %i.\n", aFile, error);
+      fflush(stderr);
+      exit(1);
+    }
+
+
+    displayConfig.outputScreenWidth = displayConfig.singlePanelWidth * displayConfig.totalPanelsWide;
+    displayConfig.outputScreenHeight = displayConfig.singlePanelHeight * displayConfig.totalPanelsTall;
+
+    return displayConfig;
+  }
 public:
 
   explicit NetworkDisplay(NetworkDisplayConfig config);
