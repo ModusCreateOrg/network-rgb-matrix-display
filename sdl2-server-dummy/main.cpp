@@ -127,7 +127,7 @@ uint32_t toRGB888(uint16_t color) {
 
 }
 
-void renderSDLWindow(void) {
+void startSDL2Window(void) {
 
   printf("renderWindow thread...");
 
@@ -151,21 +151,21 @@ void renderSDLWindow(void) {
     if (0 == SDL_LockTexture(texture, nullptr, &screenBuf, &pitch)) {
       auto *screenBits = (int32_t *) screenBuf;
 
-//      std::memset(screenBuf, color, (SCREEN_WIDTH * SCREEN_HEIGHT));
+      std::memset(screenBuf, color, (SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(int32_t));
 
       pthread_mutex_lock(&bufferMutex);
 
       // Copy data to screenBuff
 
-      int sbIndex = 0;
-      for (int row = 0; row < matrixHeight * numMatricesTall; row++) {
-        for (int col = 0; col < matrixWidth * numMatricesWide; col++) {
-          *screenBits++ = toRGB888(screenBuffer[sbIndex]);
-          sbIndex++;
-        }
-
-        screenBits += (SCREEN_WIDTH - (matrixWidth * numMatricesWide));
-      }
+//      int sbIndex = 0;
+//      for (int row = 0; row < matrixHeight * numMatricesTall; row++) {
+//        for (int col = 0; col < matrixWidth * numMatricesWide; col++) {
+//          *screenBits++ = toRGB888(screenBuffer[sbIndex]);
+//          sbIndex++;
+//        }
+//
+//        screenBits += (SCREEN_WIDTH - (matrixWidth * numMatricesWide));
+//      }
 
       pthread_mutex_unlock(&bufferMutex);
 
@@ -324,23 +324,22 @@ int main(int argc, char* argv[]) {
   signal(SIGINT, InterruptHandler);
   std::thread(interrupterThread).detach();
 
-
+  setupSDL();
 
   screenBuffer = (uint16_t *)std::malloc(sizeof(uint16_t) * totalPixels);
 
   try {
     unsigned short port = 9890;
-//    for (int i = 0; i < 5; i++) {
-//      printf("Starting thread %i:\n", i);
-//      printf("  Listening on port %i\n", port);
-//      printf("  Attempting to receive %lu bytes\n", sizeof(uint16_t) * totalPixels);
-//
-//      std::thread(serverStarterThread, port++).detach();
-////      break;
-//    }
+    for (int i = 0; i < 5; i++) {
+      printf("Starting thread %i:\n", i);
+      printf("  Listening on port %i\n", port);
+      printf("  Attempting to receive %lu bytes\n", sizeof(uint16_t) * totalPixels);
+
+      std::thread(serverStarterThread, port++).detach();
+    }
     std::thread(serverStarterThread, port).detach();
 
-//    renderSDLWindow();
+    startSDL2Window();
 
   }
   catch (std::exception& e) {
@@ -393,9 +392,7 @@ int main(int argc, char* argv[]) {
 //  }
 
   while(! shouldQuit) {
-
     SDL_Delay(100);
-
   }
 
 

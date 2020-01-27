@@ -24,8 +24,8 @@ NetworkDisplay::NetworkDisplay(NetworkDisplayConfig config) {
   mFrameRate = config.frameRate;
 
 
-  mInputScreenWidth = config.inputScreenWidth;
-  mInputScreenHeight = config.inputScreenHeight;
+  mInputScreenWidth = config.inputStreamWidth;
+  mInputScreenHeight = config.inputStreamHeight;
   mTotalInputPixels = mInputScreenWidth * mInputScreenHeight;
 
   mInputBufferSize =  mTotalInputPixels * sizeof(uint16_t);
@@ -78,11 +78,9 @@ void NetworkDisplay::InitNetworkSegments() {
     segmentConfig.numPanelsTall = mConfig.segmentPanelsTall;
 
 
-    segmentConfig.destinationPort = mConfig.destinationPort;
+    segmentConfig.destinationPort = mConfig.segments[i].destinationPort;
 
-    char *destinationIp = (char *)malloc(strlen(mConfig.destinationIP));
-    sprintf(destinationIp, mConfig.destinationIP, ipFinalDigit++);
-    segmentConfig.destinationIP = destinationIp;
+    segmentConfig.destinationIP = mConfig.segments[i].destinationIp;
 
     mTotalOutputPixels += (segmentConfig.singlePanelWidth * segmentConfig.singlePanelHeight) * segmentConfig.numPanelsWide * segmentConfig.numPanelsTall;
 
