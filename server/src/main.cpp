@@ -133,13 +133,13 @@ int main(int argc, char* argv[]) {
   printf("%s\n", hostname);
   fflush(stdout);
 
-//  if (argc < 2) {
-//    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
-//    exit(127);
-//  }
+  if (argc < 2) {
+    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
+    exit(127);
+  }
 
-  const char *file = "rgb-server.ini";
-  NetworkServerConfig *serverConfig = NetworkServerConfig::FromIniFile(file);
+//  const char *file = "rgb-server.ini";
+  NetworkServerConfig *serverConfig = NetworkServerConfig::FromIniFile(argv[1]);
   serverConfig->Describe();
   printf("serverConfig %p\n", serverConfig); fflush(stdout);
   start_matrix(serverConfig);
