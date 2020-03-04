@@ -48,11 +48,10 @@ void interrupterThread() {
       exit(1);
     }
 
-//    printf("avg %f      \r", server->mAverage);
-//    matrixStrip->mFrameCount++;
+
     if (server->mAverage == priorAverage) {
       retries++;
-      if (retries > 5) {
+      if (retries > 4) {
 //        printf("\n**CLEAR BUFFERS!! retries=%i\n",retries);
 
         server->mAverage = 0;
@@ -106,11 +105,10 @@ void start_matrix(NetworkServerConfig *aServerConfig) {
 //  runtime_opt.drop_privileges = aServerConfig->runtime_options.drop_privileges;
 //  runtime_opt.do_gpio_init = aServerConfig->runtime_options.do_gpio_init;
 
-
   RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
 
   if (matrix == nullptr) {
-    printf("ERROR! Could not create RGBMatrix instance!!!!\n"); 
+    printf("ERROR! Could not create RGBMatrix instance!!!!\n");
     exit(1);
   }
 
