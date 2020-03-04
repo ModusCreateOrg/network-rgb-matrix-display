@@ -49,18 +49,19 @@ public:
   }
 
   void LockMutex() {
-//  printf("%i MatrixStrip::%s %p\n", mSegmentId, __FUNCTION__, &mMutex);
+//    printf("MatrixStrip::%s\n", __FUNCTION__); fflush(stdout);
     pthread_mutex_lock(&mMutex);
   }
 
   void UnlockMutex() {
-//  printf("MatrixStrip::%s\n", __FUNCTION__);fflush(stdout);
+//    printf("MatrixStrip::%s\n", __FUNCTION__); fflush(stdout);
     pthread_mutex_unlock(&mMutex);
   }
 
 
   void ClearBuffers() {
-//    printf("%s\n", __FUNCTION__); fflush(stdout);
+    printf("%s %i\n", __FUNCTION__, mFrameCount); fflush(stdout);
+
     LockMutex();
     mCanvas1->Fill(0,0,0);
     mCanvas2->Fill(0,0,0);

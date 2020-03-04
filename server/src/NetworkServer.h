@@ -11,40 +11,32 @@
 #include <time.h>
 
 #include <thread>
-#include "MatrixSegment.h"
-
 using boost::asio::ip::tcp;
 
 
-struct NetworkServerConfig {
-  uint16_t singlePanelWidth;
-  uint16_t singlePanelHeight;
-  uint8_t numPanelsWide;
-  uint8_t numPanelsTall;
-  uint8_t segmentId;
-  uint16_t incomingPort;
-  MatrixSegment *matrixStripInstance;
-};
+#include "MatrixSegment.h"
+#include "NetworkServerConfig.h"
+#include "ini.h"
 
 class NetworkServer {
+
 public:
-  uint8_t  mSegmentId;
-  uint16_t mSinglePanelWidth;
-  uint16_t mSinglePanelHeight;
-  uint16_t mPixelsPerPanel;
+  int  mSegmentId;
+  int mSinglePanelWidth;
+  int mSinglePanelHeight;
+  int mPixelsPerPanel;
 
-  uint16_t mPanelsWide;
-  uint16_t mPanelsTall;
+  int mPanelsWide;
+  int mPanelsTall;
 
-  uint16_t mSegmentWidth;
-  uint16_t mSegmentHeight;
+  int mSegmentWidth;
+  int mSegmentHeight;
 
-  uint16_t mTotalPixels;
+  int mTotalPixels;
 
   size_t mTotalBytes;
 
-
-  uint16_t mIncomingPort;
+  unsigned short mIncomingPort;
 
   volatile uint32_t mNumberSamples;
   volatile double mTotalDelta;
@@ -52,7 +44,7 @@ public:
   volatile double mPriorAverage;
 
 public:
-  explicit NetworkServer(struct NetworkServerConfig config);
+  explicit NetworkServer(NetworkServerConfig *config);
 
   ~NetworkServer();
 
@@ -94,6 +86,8 @@ private:
 
   pthread_mutex_t mMutex;
   std::thread mThread;
+  unsigned short mPort;
+  const char *mIP;
 
   MatrixSegment *mMatrixStrip;
 };

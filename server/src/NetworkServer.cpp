@@ -17,42 +17,49 @@
 #include <time.h>
 
 #include "NetworkServer.h"
-
+#include "NetworkServerConfig.h"
 
 using boost::asio::ip::tcp;
 using std::min;
 using std::max;
 
-NetworkServer::NetworkServer(struct NetworkServerConfig config) {
-#ifdef __linux__
+NetworkServer::NetworkServer(NetworkServerConfig *config) {
+//#ifdef __linux__
   pthread_mutex_destroy(&mMutex);
   pthread_mutex_init(&mMutex, nullptr);
-#endif
+//#endif
 
   mNumberSamples = 0;
   mTotalDelta = 0;
   mAverage = 0;
   mPriorAverage = 0;
+  mThreadRunning = false;
 
   mFrameCount = 0;
-  mSegmentId = config.segmentId;
-  mIncomingPort = config.incomingPort;
+  mSegmentId = config->segmentId;
+  mIncomingPort = config->incomingPort;
 
-  mSinglePanelWidth = config.singlePanelWidth;
-  mSinglePanelHeight = config.singlePanelHeight;
+  mSinglePanelWidth = config->singlePanelWidth;
+  mSinglePanelHeight = config->singlePanelHeight;
 
   mPixelsPerPanel = mSinglePanelWidth * mSinglePanelWidth;
 
-  mSegmentWidth = config.singlePanelWidth * config.numPanelsWide;
-  mSegmentHeight = config.singlePanelHeight * config.numPanelsTall;
+  mSegmentWidth = config->singlePanelWidth * config->numPanelsWide;
+  mSegmentHeight = config->singlePanelHeight * config->numPanelsTall;
 
-  mPanelsWide = config.numPanelsWide;
-  mPanelsTall = config.numPanelsTall;
+  mPanelsWide = config->numPanelsWide;
+  mPanelsTall = config->numPanelsTall;
 
   mTotalPixels = mPixelsPerPanel * mPanelsWide * mPanelsTall;
   mTotalBytes = mTotalPixels * sizeof(uint16_t);
 
-  mMatrixStrip = config.matrixStripInstance;
+  mMatrixStrip = config->matrixStripInstance;
+
+  mPort = config->port;
+  printf("IP is %s\n", config->ip);
+  fflush(stdout);
+  mIP = strdup(config->ip);
+
 
 #ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
   Describe();
@@ -74,7 +81,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
   const char *returnData = "K";
 
   while (GetThreadRunning()) {
-    nColor = random() & UINT16_MAX;
+//    nColor = random() & UINT16_MAX;
 
     try {
       nColor++;
@@ -87,7 +94,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 
       // Ended early! No bueno!
       if (error == boost::asio::error::eof){
-//        printf("Eof\n"); fflush(stdout);
+        printf("Eof\n"); fflush(stdout);
         break;
       }
       else if (error) {
@@ -96,50 +103,6 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 
 
       boost::asio::write(sock, boost::asio::buffer(returnData, 1));
-//
-//
-//      if (numBytesReceived == mTotalBytes) {
-//        end = clock();
-//
-//        mNumberSamples++;
-//        double delta = (end - start);
-//        mTotalDelta += delta;
-//        mAverage = (mTotalDelta / mNumberSamples) ;
-//        /// CLOCKS_PER_SEC
-//
-////        uint8_t r = (nColor & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
-////        uint8_t g = (nColor & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
-////        uint8_t b = (nColor & 0x1F) << 3;         // ............bbbbb -> bbbbb000
-////        mMatrixStrip->GetDisplayCanvas()->Fill(r,g,b);
-//#ifdef __MATRIX_STRIP_BOTTOM_UP__
-//        int ptrIndex = mTotalPixels - 1;
-//#else
-//        int ptrIndex = 0;
-//#endif
-//        uint16_t *outputBuff = data;
-//
-//        int col = 0;
-//        int row = mMatrixStrip->mCanvasWidth;
-//        for (; row > 0 ; row--) {
-//
-//          col = 0;
-//          for (; col < mMatrixStrip->mCanvasHeight; col++) {
-//
-//#ifdef __MATRIX_STRIP_BOTTOM_UP__
-//            uint16_t pixel = outputBuff[ptrIndex--];
-////            pixel = nColor;
-//#else
-//            uint16_t pixel = outputBuff[ptrIndex++];
-//#endif
-//            // Color separation based off : https://stackoverflow.com/questions/38557734/how-to-convert-16-bit-hex-color-to-rgb888-values-in-c
-//            uint8_t r = (pixel & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
-//            uint8_t g = (pixel & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
-//            uint8_t b = (pixel & 0x1F) << 3;         // ............bbbbb -> bbbbb000
-//
-//            mMatrixStrip->GetRenderCanvas()->SetPixel(row, col, r, g, b);
-//          }
-//
-//        }
 
 
 
@@ -151,8 +114,8 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
         double delta = (end - start);
         mTotalDelta += delta;
         mAverage = (mTotalDelta / mNumberSamples) ;
-        /// CLOCKS_PER_SEC
 
+          // This is some debugging crap.
 //        uint8_t r = (nColor & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
 //        uint8_t g = (nColor & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
 //        uint8_t b = (nColor & 0x1F) << 3;         // ............bbbbb -> bbbbb000
@@ -204,7 +167,7 @@ void NetworkServer::ServerStartingThread() {
   mThreadRunning = true;
 
   boost::asio::io_context io_context;
-  unsigned short port = 9890;
+  unsigned short port = mPort;
   tcp::acceptor a(io_context, tcp::endpoint(tcp::v4(), port));
 
   sched_param sch_params;
@@ -263,18 +226,7 @@ void NetworkServer::StartThread() {
 
 
   starterThread.detach();
-//
-//  mThreadRunning = true;
-//
-//  boost::asio::io_context io_context;
-//  unsigned short port = 9890;
-//  tcp::acceptor a(io_context, tcp::endpoint(tcp::v4(), port));
-//
-//  printf("%s\n", __FUNCTION__);
-//  while (mThreadRunning) {
-//    mThread = std::thread(&NetworkServer::ReceiveDataThread, this, a.accept());
-//    mThread.detach();
-//  }
+
 }
 
 
@@ -289,17 +241,18 @@ void NetworkServer::StopThread() {
 }
 
 void NetworkServer::LockMutex() {
-//  printf("%i NetworkServer::%s %p\n", mSegmentId, __FUNCTION__, &mMutex);
+  printf("%i NetworkServer::%s %p\n", mSegmentId, __FUNCTION__, &mMutex);
   pthread_mutex_lock(&mMutex);
 }
 
 void NetworkServer::UnlockMutex() {
-//  printf("NetworkServer::%s\n", __FUNCTION__);fflush(stdout);
+  printf("NetworkServer::%s\n", __FUNCTION__); fflush(stdout);
 
   pthread_mutex_unlock(&mMutex);
 }
 
 void NetworkServer::Describe() {
+  printf("---------\n");
   printf("NetworkServer %p\n", this);
   printf("\tmSegmentId = %i\n", mSegmentId);
   printf("\tmSinglePanelWidth = %i\n", mSinglePanelWidth);

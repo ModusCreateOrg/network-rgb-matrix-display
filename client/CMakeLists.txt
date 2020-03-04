@@ -16,14 +16,16 @@ INCLUDE_DIRECTORIES(
 )
 
 
-# Currently using everything. Compilation is a little slower, we could work to remove items if we wish.
+set(INI_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ini)
+
 file(
   GLOB SOURCE_FILES
   ${CMAKE_SOURCE_DIR}/src/*.cpp
-  ${CMAKE_SOURCE_DIR}/src/lib/*.c
+  ${INI_LIB_DIR}/*.c
 )
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/lib)
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src ${INI_LIB_DIR}/)
 
 
 #SET(DEBUG_USE_SDL_WINDOW=true)

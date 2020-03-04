@@ -1,30 +1,19 @@
-/*
-@Author Jay Garcia https://github.com/jaygarcia/
-
-@Purpose: Is the main program for an RGB Matrix "Strip".
-          See How_it_works.md for more details
-*/
-
 #include <cstdlib>
 #include <iostream>
 #include <thread>
 #include <utility>
-#include <boost/asio.hpp>
-#include <cstring>
 #include <pthread.h>
-#include <time.h>
 
 #include "led-matrix.h"
-#include "pixel-mapper.h"
 #include "graphics.h"
 
-#include <assert.h>
 #include <getopt.h>
 #include <signal.h>
-#include <string.h>
 
 #include "NetworkServer.h"
+#include "NetworkServerConfig.h"
 #include "MatrixSegment.h"
+#include "ini.h"
 
 using std::min;
 using std::max;
@@ -33,17 +22,6 @@ using namespace rgb_matrix;
 
 
 pthread_mutex_t bufferMutex;
-
-// Change the following constants to your liking. The number of bytes that are sent
-// will need to match readBufferSize!
-const uint16_t singlePanelWidth = 64;
-const uint16_t singlePanelHeight = 64;
-const uint16_t totalSinglePanelSize = (singlePanelHeight * singlePanelWidth);
-const uint16_t numMatricesWide = 4;
-const uint16_t numMatricesTall = 1; // Should be 4!!
-const uint16_t totalPixels = totalSinglePanelSize * numMatricesWide * numMatricesTall;
-const size_t readBufferSize = totalPixels * sizeof(uint16_t);
-
 
 
 /***********************************************************************/
@@ -59,7 +37,7 @@ double priorAverage = 0;
 int retries = 0;
 
 bool shouldQuit = false;
-MatrixSegment *matrixStrip = NULL;
+MatrixSegment *matrixStrip = nullptr;
 
 // This function will loop and help exit gracefully if an interrupt is received.
 void interrupterThread() {
@@ -70,23 +48,22 @@ void interrupterThread() {
       exit(1);
     }
 
-//    server->LockMutex();
-//    printf("avg %f      \r", server->mAverage);
 
     if (server->mAverage == priorAverage) {
-      retries ++;
-      if (retries > 1) {
+      retries++;
+      if (retries > 4) {
 //        printf("\n**CLEAR BUFFERS!! retries=%i\n",retries);
 
         server->mAverage = 0;
         retries = 0;
-        matrixStrip->ClearBuffers();
+        if (matrixStrip) {
+          matrixStrip->ClearBuffers();
+        }
       }
 
     }
 
     priorAverage = server->mAverage;
-//    server->UnlockMutex();
     usleep(500000);
   }
 }
@@ -94,53 +71,43 @@ void interrupterThread() {
 /***********************************************************************/
 
 
-void start_matrix() {
+void start_matrix(NetworkServerConfig *aServerConfig) {
 
   RGBMatrix::Options matrix_options;
 
 
-  // I hard coded options here. You'll need to change this per your own specs!
-  matrix_options.chain_length = numMatricesWide;
-  matrix_options.cols = singlePanelWidth;
-  matrix_options.rows = singlePanelHeight;
-  matrix_options.parallel = 1;
-//  matrix_options.brightness = 70;
+  matrix_options.chain_length = aServerConfig->numPanelsWide;
+  matrix_options.cols = aServerConfig->singlePanelWidth;
+  matrix_options.rows = aServerConfig->singlePanelHeight;
 
-#ifdef __MATRIX_SHOW_DEBUG_MESSAGES__
-  matrix_options.show_refresh_rate = true;
-#endif
+  matrix_options.hardware_mapping = strdup(aServerConfig->matrix_options.hardware_mapping);
+  matrix_options.chain_length = aServerConfig->matrix_options.chain_length;
+  matrix_options.parallel = aServerConfig->matrix_options.parallel;
+  matrix_options.pwm_bits = aServerConfig->matrix_options.pwm_bits;
+  matrix_options.pwm_lsb_nanoseconds = aServerConfig->matrix_options.pwm_lsb_nanoseconds;
+  matrix_options.pwm_dither_bits = aServerConfig->matrix_options.pwm_dither_bits;
+  matrix_options.brightness = aServerConfig->matrix_options.brightness;
+  matrix_options.scan_mode = aServerConfig->matrix_options.scan_mode;
+  matrix_options.multiplexing = aServerConfig->matrix_options.multiplexing;
+  matrix_options.disable_hardware_pulsing = aServerConfig->matrix_options.disable_hardware_pulsing;
+  matrix_options.row_address_type = aServerConfig->matrix_options.row_address_type;
 
-#ifdef __MODUS_PI_VERSION_3__
-  matrix_options.pwm_bits = 4;
-#endif
+  matrix_options.show_refresh_rate = aServerConfig->matrix_options.show_refresh_rate;
+  matrix_options.inverse_colors = aServerConfig->matrix_options.inverse_colors;
+  matrix_options.led_rgb_sequence = strdup(aServerConfig->matrix_options.led_rgb_sequence);
 
-#ifdef __MODUS_PI_VERSION_4__
-  matrix_options.pwm_bits = 6;
-#endif
+  matrix_options.pixel_mapper_config = strdup(aServerConfig->matrix_options.pixel_mapper_config);
 
 
   rgb_matrix::RuntimeOptions runtime_opt;
-
-
-#ifdef __MATRIX_RUN_AS_DAEMON__
-  runtime_opt.daemon = 1;
-#endif
-
-#ifdef __MODUS_PI_VERSION_3__
-//  printf("Raspberry Pi 3 detected!\n");
-//  runtime_opt.gpio_slowdown = 3;
-#endif
-
-
-  // Detect raspberry pi 4 & slow down GPIO
-#ifdef __MODUS_PI_VERSION_4__
-  printf("Raspberry Pi 4 detected!\n");
-  runtime_opt.gpio_slowdown = 3;
-#endif
-
+  runtime_opt.gpio_slowdown = aServerConfig->runtime_options.gpio_slowdown;
+//  runtime_opt.daemon = aServerConfig->runtime_options.daemon;
+//  runtime_opt.drop_privileges = aServerConfig->runtime_options.drop_privileges;
+//  runtime_opt.do_gpio_init = aServerConfig->runtime_options.do_gpio_init;
 
   RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
-  if (matrix == NULL) {
+
+  if (matrix == nullptr) {
     printf("ERROR! Could not create RGBMatrix instance!!!!\n");
     exit(1);
   }
@@ -149,19 +116,16 @@ void start_matrix() {
          matrix->width(), matrix->height(), matrix_options.hardware_mapping);
 
   matrixStrip = new MatrixSegment(matrix);
-  matrixStrip->mTotalPixels = totalPixels;
+  matrixStrip->mTotalPixels = aServerConfig->totalPixels;
 
+  printf("matrixStrip->Start()\n"); fflush(stdout);
   matrixStrip->Start();
 }
 
 
-
-/**** MAIN *****/
 int main(int argc, char* argv[]) {
   signal(SIGTERM, InterruptHandler);
   signal(SIGINT, InterruptHandler);
-
-//  printf("Server starting & expecting (%lu bytes)...\n", readBufferSize); fflush(stdout);
   char hostname[1024];
   hostname[1023] = '\0';
   gethostname(hostname, 1023);
@@ -169,30 +133,30 @@ int main(int argc, char* argv[]) {
   printf("%s\n", hostname);
   fflush(stdout);
 
+  if (argc < 2) {
+    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
+    exit(127);
+  }
 
-  start_matrix();
+//  const char *file = "rgb-server.ini";
+  NetworkServerConfig *serverConfig = NetworkServerConfig::FromIniFile(argv[1]);
+  serverConfig->Describe();
+  printf("serverConfig %p\n", serverConfig); fflush(stdout);
+  start_matrix(serverConfig);
+  serverConfig->matrixStripInstance = matrixStrip;
 
-  NetworkServerConfig serverConfig;
-  serverConfig.incomingPort = 9890;
-  serverConfig.numPanelsWide = numMatricesWide;
-  serverConfig.numPanelsTall = numMatricesTall;
-  serverConfig.singlePanelWidth = singlePanelWidth;
-  serverConfig.singlePanelHeight = singlePanelHeight;
-  serverConfig.segmentId = 1;
-  serverConfig.matrixStripInstance = matrixStrip;
-
-//  usleep(1000);
-  server = new  NetworkServer(serverConfig);
+  server = new NetworkServer(serverConfig);
+  server->Describe();
   server->StartThread();
 
-//  usleep(10);
   std::thread(interrupterThread).detach();
 
 
   while (!interrupt_received) {
-//    printf("Main sleeping\n");
+//    printf("Main sleeping\n");fflush(stdout);
     sleep(1); // Time doesn't really matter. The syscall will be interrupted.
   }
+  printf("\n");fflush(stdout);
 
   return 0;
 }
