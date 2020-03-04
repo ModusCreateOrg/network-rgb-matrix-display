@@ -5,6 +5,7 @@ project(matrix-server)
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_BUILD_TYPE Debug)
 
 
 # external libraries
@@ -43,7 +44,7 @@ file(
   ${MATRIX_SRC_DIR}/lib/*.cc
   ${MATRIX_SRC_DIR}/lib/*.c
   ${MATRIX_SRC_DIR}/lib/*.h
-  ${INI_LIB_DIR}/*.c
+  ${INI_LIB_DIR}/*.c*
 )
 
 INCLUDE_DIRECTORIES(${MATRIX_SRC_DIR}/include ${MATRIX_SRC_DIR}/lib)

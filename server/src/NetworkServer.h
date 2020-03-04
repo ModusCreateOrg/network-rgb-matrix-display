@@ -19,39 +19,24 @@ using boost::asio::ip::tcp;
 #include "ini.h"
 
 class NetworkServer {
+
 public:
-  static NetworkServerConfig GenerateConfigFromFile(const char *aFile) {
-    NetworkServerConfig svrConfig;
-    int error = ini_parse(aFile, ini_file_handler, &svrConfig);
-    if (error != 0) {
-      fprintf(stderr, "Fatal Error: Can't parse %s. Error code %i.\n", aFile, error);
-      fflush(stderr);
-      exit(1);
-    }
+  int  mSegmentId;
+  int mSinglePanelWidth;
+  int mSinglePanelHeight;
+  int mPixelsPerPanel;
 
-    svrConfig.totalSinglePanelSize = svrConfig.singlePanelHeight * svrConfig.singlePanelWidth;
-    svrConfig.totalPixels = svrConfig.totalSinglePanelSize * svrConfig.numPanelsWide * svrConfig.numPanelsTall;
+  int mPanelsWide;
+  int mPanelsTall;
 
-    return svrConfig;
-  }
-public:
-  uint8_t  mSegmentId;
-  uint16_t mSinglePanelWidth;
-  uint16_t mSinglePanelHeight;
-  uint16_t mPixelsPerPanel;
+  int mSegmentWidth;
+  int mSegmentHeight;
 
-  uint16_t mPanelsWide;
-  uint16_t mPanelsTall;
-
-  uint16_t mSegmentWidth;
-  uint16_t mSegmentHeight;
-
-  uint16_t mTotalPixels;
+  int mTotalPixels;
 
   size_t mTotalBytes;
 
-
-  uint16_t mIncomingPort;
+  unsigned short mIncomingPort;
 
   volatile uint32_t mNumberSamples;
   volatile double mTotalDelta;
@@ -59,7 +44,7 @@ public:
   volatile double mPriorAverage;
 
 public:
-  explicit NetworkServer(struct NetworkServerConfig config);
+  explicit NetworkServer(NetworkServerConfig *config);
 
   ~NetworkServer();
 
