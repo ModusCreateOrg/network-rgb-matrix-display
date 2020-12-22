@@ -91,7 +91,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
       start = clock();
 
       boost::system::error_code error;
-      size_t length = boost::asio::read(sock, boost::asio::buffer(&data, mTotalBytes), boost::asio::transfer_exactly(mTotalBytes), error);
+      size_t length = boost::asio::read(sock, boost::asio::buffer(data, mTotalBytes), boost::asio::transfer_exactly(mTotalBytes), error);
 
       numBytesReceived += length;
 //      printf("numBytesReceived %i\n", numBytesReceived);
