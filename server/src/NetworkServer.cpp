@@ -75,9 +75,11 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
   volatile clock_t start = 0;
   volatile clock_t end = 0;
 
-  static uint16_t data[32768];
+  // 32768 = ((NumPixelsWide * NmPixelsTall) * NumPixelsInSegment) * SizeOf(uint16_t)
+  //       = ((64 * 64) * 4) * 2
+//  static uint16_t data[32768];
 //  memset(data,0,mTotalBytes);
-//  auto *data = (uint16_t *)malloc(mTotalBytes);
+  auto *data = (uint16_t *)malloc(mTotalBytes);
   const char *returnData = "K";
 
   while (GetThreadRunning()) {
@@ -159,6 +161,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
     }
   }
 
+  delete data;
   mFrameCount++;
 }
 

@@ -55,7 +55,7 @@ public:
   void UnlockMutex();
 
   void ClearBuffers() {
-    printf("%s\n", __FUNCTION__);
+    printf("\n%s\n", __FUNCTION__);
     fflush(stdout);
     LockMutex();
     mMatrixStrip->mRenderCanvas->Fill(0, 0, 0);
