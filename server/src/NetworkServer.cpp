@@ -56,7 +56,6 @@ NetworkServer::NetworkServer(NetworkServerConfig *config) {
   mMatrixStrip = config->matrixStripInstance;
 
   mPort = config->port;
-  printf("IP is %s\n", config->ip);
   fflush(stdout);
   mIP = strdup(config->ip);
 

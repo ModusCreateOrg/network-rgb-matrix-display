@@ -30,7 +30,7 @@ public:
   volatile bool mShouldRun;
 
   bool mShouldClearBuffers;
-  uint16_t mClearBufferDelay;
+  unsigned long mClearBuffersDelay;
 
 
 public:

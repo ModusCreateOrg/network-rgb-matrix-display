@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 //    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
     uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
     bzero(inputBuffer, networkDisplay->GetInputBufferSize());
-
+    memset(inputBuffer, color, networkDisplay->GetInputBufferSize());
 //    printf("Color %i\n", color);
 //
 
@@ -102,27 +102,11 @@ int main(int argc, char* argv[]) {
 
     inputBuffer[nX + (nY * screenWidth)] = color;
 
-
     nX++;
-
 
 //    printf("nX(%i) nY(%i)\n", nX, nY);
 
-
-    uint16_t width = networkDisplay->GetOutputScreenWidth(),
-             height = networkDisplay->GetInputScreenHeight();
-//    for (uint16_t i = 0; i < width; i++) {
-//      inputBuffer[i] = color;
-//    }
-
-//    memset(inputBuffer, color, networkDisplay->GetInputBufferSize());
-
-//    for (unsigned short z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
-//      inputBuffer[z] = random() & UINT16_MAX;
-//    }
-//    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
     networkDisplay->Update();
-//    usleep(10000 * 10);
   }
 
 

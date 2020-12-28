@@ -110,12 +110,15 @@ public:
       return;
     }
 
+    mSNext = (mSNext + 1000 / mFrameRate);
+
+
     if (mSNow < mSNext) {
-      usleep((mSNext - mSNow) * 1000);
+      uint16_t sleepTime = (mSNext - mSNow) * 1000;
+      usleep(sleepTime);
       mSNow = Milliseconds();
     }
 
-    mSNext = (mSNext + 1000 / mFrameRate);
   }
 
   uint32_t Milliseconds() {

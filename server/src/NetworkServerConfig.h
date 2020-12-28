@@ -17,7 +17,8 @@ public:
       auto *reader = new INIReader(aFile);
 
       serverConfig->autoClearDisplay = (bool)reader->GetBoolean("general", "auto_clear_display", true);
-      serverConfig->autoClearDelay = (bool)reader->GetInteger("general", "auto_clear_delay", 5000);
+      serverConfig->autoClearDelay = (unsigned long)reader->GetInteger("general", "auto_clear_delay", 50000000);
+
 
       serverConfig->singlePanelWidth  = (int)reader->GetInteger("matrix_dimensions", "width", 0);
       serverConfig->singlePanelHeight  = (int)reader->GetInteger("matrix_dimensions", "height", 0);
@@ -86,7 +87,7 @@ public:
   int incomingPort;
 
   bool autoClearDisplay;
-  uint16_t autoClearDelay;
+  unsigned long autoClearDelay;
 
 //  int totalSinglePanelSize;
   int totalPixels;
@@ -108,6 +109,8 @@ public:
     printf("\tincomingPort = %i\n", incomingPort);
 //    printf("\ttotalSinglePanelSize = %i\n", totalSinglePanelSize);
     printf("\ttotalPixels = %i\n", totalPixels);
+    printf("\tautoClearDisplay = %s\n", autoClearDisplay ? "true" : "false");
+    printf("\tautoClearDelay = %lu\n", autoClearDelay);
     printf("\tip = %s\n", ip);
     printf("\tport = %u\n", port);
     printf("--- matrix_options ---\n");
