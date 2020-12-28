@@ -28,7 +28,7 @@ file(
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src ${INI_LIB_DIR}/)
 
 
-#SET(DEBUG_USE_SDL_WINDOW=true)
+SET(DEBUG_USE_SDL_WINDOW=true)
 # Direct linux controls (non-SDL2!)
 #if (DEFINED ENV{DEBUG_USE_SDL_WINDOW})
 if (1)
@@ -55,6 +55,12 @@ endif()
 
 add_executable(${PROJECT_NAME} examples/simple.cpp ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${ADDITIONAL_LIBRARIES})
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/examples/simple.ini
+    ${CMAKE_CURRENT_BINARY_DIR}/simple.ini)
 
 
 

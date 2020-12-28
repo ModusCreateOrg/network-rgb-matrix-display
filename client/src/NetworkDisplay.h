@@ -21,12 +21,9 @@ public:
     if (error != 0) {
       fprintf(stderr, "Fatal Error: Can't parse %s. Error code %i.\n", aFile, error);
       fflush(stderr);
-      exit(1);
+      exit(error);
     }
 
-
-    displayConfig.outputScreenWidth = displayConfig.singlePanelWidth * displayConfig.totalPanelsWide;
-    displayConfig.outputScreenHeight = displayConfig.singlePanelHeight * displayConfig.totalPanelsTall;
 
     return displayConfig;
   }
@@ -53,8 +50,21 @@ public:
     return mFrameCount;
   }
 
+
 public:
 
+  uint16_t GetOutputScreenWidth() {
+    return mOutputScreenWidth;
+  }
+  uint16_t GetOutputScreenHeight() {
+    return mOutputScreenHeight;
+  }
+  uint16_t GetInputScreenWidth() {
+    return mInputScreenWidth;
+  }
+  uint16_t GetInputScreenHeight() {
+    return mInputScreenHeight;
+  }
   size_t GetTotalInputPixels() {
     return mInputBufferSize;
   }
@@ -66,6 +76,7 @@ public:
   bool GetThreadRunnning() {
     return mThreadRunning;
   }
+
 
   void StartThread() {
     mThreadRunning = true;
@@ -120,11 +131,11 @@ public:
 
 
 private:
-  NetworkDisplayConfig mConfig;
+  NetworkDisplayConfig mConfig{};
 
   int mFrameRate;
-  uint16_t mScreenWidth;
-  uint16_t mScreenHeight;
+  uint16_t mScreenWidth{};
+  uint16_t mScreenHeight{};
 
 
   void InitNetworkSegments();
@@ -156,8 +167,8 @@ private:
   std::vector<SegmentClient *> mSegments;
   uint16_t mFrameCount;
 
-  bool mThreadRunning;
-  pthread_mutex_t mMutex;
+  bool mThreadRunning{};
+  pthread_mutex_t mMutex{};
 
 #ifdef __USE_SDL2_VIDEO__
   SDL2Display *mSDL2Display;

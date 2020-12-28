@@ -35,16 +35,20 @@ uint16_t color = random() % UINT16_MAX;
 
 int main(int argc, char* argv[]) {
 
-  for (int i = 0; i < argc; i++) {
-    printf("arg %i\t%s\n", i, argv[i]);
-  };
+//
+//
+//  for (int i = 0; i < argc; i++) {
+//    printf("arg %i\t%s\n", i, argv[i]);
+//  };
+//
+//  if (argc < 2) {
+//    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
+//    exit(127);
+//  }
 
-  if (argc < 2) {
-    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
-    exit(127);
-  }
+  const char *file = "simple.ini";
 
-  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(argv[1]);
+  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(file);
 
   displayConfig.Dump();
 
@@ -57,22 +61,60 @@ int main(int argc, char* argv[]) {
 
 
   std::thread(interrupterThread).detach();
+//
+//  while (! interrupt_received) {
+//    color++;// random() & UINT16_MAX;
+////    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
+//    uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
+//    memset(inputBuffer, color++, networkDisplay->GetInputBufferSize());
+////    printf("Color %i\n", color);
+////
+//    for (unsigned short z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
+//      inputBuffer[z] = random() & UINT16_MAX;
+//    }
+////    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
+//    networkDisplay->Update();
+////    usleep(10000);
+//  }
 
+//  uint16_t width = networkDisplay->
+  uint16_t position = 0;
+  color = 0;
   while (! interrupt_received) {
-    color = random() & UINT16_MAX;
+//    color++;// random() & UINT16_MAX;
 //    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
     uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
-    memset(inputBuffer, color++, networkDisplay->GetInputBufferSize());
-//    printf("Color %i\n", color);
+    bzero(inputBuffer, networkDisplay->GetInputBufferSize());
 
-//    for (uint16_t z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
-//      inputBuffer[z] = color++;
+//    printf("Color %i\n", color);
+//
+
+    position++;
+    if (position > networkDisplay->GetInputScreenHeight()) {
+      position = 0;
+    }
+
+
+    uint16_t width = networkDisplay->GetOutputScreenWidth(),
+             height = networkDisplay->GetInputScreenHeight();
+//    printf("width = %i\n", width);
+    for (uint16_t i = 0; i < width; i++) {
+      inputBuffer[i * 4] = color;
+    }
+//      inputBuffer[position] = color;
+
+//    memset(inputBuffer, color++, networkDisplay->GetInputBufferSize());
+
+//    for (unsigned short z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
+//      inputBuffer[z] = random() & UINT16_MAX;
 //    }
 //    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
     networkDisplay->Update();
+//    usleep(10000);
   }
 
 
+  delete networkDisplay;
 
 
   return 0;

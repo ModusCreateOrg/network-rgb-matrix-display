@@ -24,13 +24,10 @@ SegmentClient::SegmentClient(struct SegmentClientConfig config) {
   mSinglePanelHeight = config.singlePanelHeight;
   mPixelsPerPanel = mSinglePanelWidth * mSinglePanelWidth;
 
-  mSegmentWidth = config.singlePanelWidth * config.numPanelsWide;
-  mSegmentHeight = config.singlePanelHeight * config.numPanelsTall;
+  mSegmentWidth = config.segmentWidth;
+  mSegmentHeight = config.segmentHeight;
 
-  mPanelsWide = config.numPanelsWide;
-  mPanelsTall = config.numPanelsTall;
-
-  mTotalPixels = mPixelsPerPanel * mPanelsWide * mPanelsTall;
+  mTotalPixels = mSegmentWidth * mSegmentHeight;
   mTotalBytes = mTotalPixels * sizeof(uint16_t);
 
 
@@ -57,8 +54,7 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
   uint16_t currentFrame = 0;
 
-  uint16_t *data = (uint16_t *)malloc(mySegment->mTotalBytes);
-
+  auto *data = (uint16_t *)malloc(mySegment->mTotalBytes);
 
 
   while (mySegment->GetThreadRunning()) {
@@ -85,9 +81,6 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
       mySegment->LockMutex();
       uint16_t *sBuffPtr = mySegment->GetOutputBuffer();
 
-//      memset(data, (uint16_t)segmentColor, mySegment->mTotalBytes);
-
-
       memcpy(data, sBuffPtr, mySegment->mTotalBytes);
       mySegment->UnlockMutex();
 
@@ -105,10 +98,11 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
     }
     catch (std::exception& e) {
-//      std::cerr << mySegment->mDestinationIP << " " <<  __FUNCTION__ << " Exception: " << e.what() << "\n";
+      std::cerr << mySegment->mDestinationIP << " " <<  __FUNCTION__ << " Exception: " << e.what() << "\n";
     }
   }
 
+  delete data;
   printf("SegmentClient::SendDataThread ended %i\n", mySegment->mSegmentId);
 }
 
@@ -151,8 +145,6 @@ void SegmentClient::Describe() {
   printf("\tmPixelsPerPanel = %i\n", mPixelsPerPanel);
   printf("\tmSegmentWidth = %i\n", mSegmentWidth);
   printf("\tmSegmentHeight = %i\n", mSegmentHeight);
-  printf("\tmMatricesWide = %i\n", mPanelsWide);
-  printf("\tmMatricesTall = %i\n", mPanelsTall);
   printf("\tmTotalPixels = %i\n", mTotalPixels);
   printf("\tmTotalBytes = %lu\n", mTotalBytes);
   printf("\tmDestinationIP = %s\n", mDestinationIP);

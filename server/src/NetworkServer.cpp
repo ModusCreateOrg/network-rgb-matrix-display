@@ -67,6 +67,8 @@ NetworkServer::NetworkServer(NetworkServerConfig *config) {
 }
 
 uint16_t nColor = 0;
+int nX = 0;
+int nY = 0;
 
 void NetworkServer::ReceiveDataThread(tcp::socket sock) {
   int numBytesReceived = 0;
@@ -84,7 +86,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
   const char *returnData = "K";
 
   while (GetThreadRunning()) {
-//    nColor = random() & UINT16_MAX;
+    nColor = random() & UINT16_MAX;
 
     try {
       nColor++;
@@ -109,10 +111,10 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 
 
 
+
       // this thing re-orients the data so that the pixels are mapped vertically
       if (numBytesReceived == mTotalBytes) {
         end = clock();
-
         mNumberSamples++;
         double delta = (end - start);
         mTotalDelta += delta;
@@ -129,29 +131,70 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 //        break;
 
 
-        int ptrIndex = mTotalPixels - 1;
+
+
+//
+//        int ptrIndex = mTotalPixels - 1;
+//        uint16_t *outputBuff = data;
+//
+//        int y = 0;
+//        int x = mMatrixStrip->mCanvasWidth - 1;
+//        for (; x > -1 ; x--) {
+////          printf("x %i\n", x);
+//          y = 0;
+//          for (; y < mMatrixStrip->mCanvasHeight; y++) {
+//
+//            uint16_t pixel = outputBuff[ptrIndex--];
+//            // Color separation based off : https://stackoverflow.com/questions/38557734/how-to-convert-16-bit-hex-color-to-rgb888-values-in-c
+//            uint8_t r = (pixel & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
+//            uint8_t g = (pixel & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
+//            uint8_t b = (pixel & 0x1F) << 3;         // ............bbbbb -> bbbbb000
+//
+//            mMatrixStrip->GetRenderCanvas()->SetPixel(x, y, r, g, b);
+//          }
+//
+//        }
+
+        const int width = mMatrixStrip->GetRenderCanvas()->width();
+        const int height =  mMatrixStrip->GetRenderCanvas()->height();
         uint16_t *outputBuff = data;
+        int ptrIndex = 0;
+        int y = 0;
+        for (int x = 0; x < width ; x++) {
+          y = 0;
+          for (; y < mMatrixStrip->mCanvasHeight; y++) {
 
-        int col = 0;
-        int row = mMatrixStrip->mCanvasWidth - 1;
-        for (; row > -1 ; row--) {
-//          printf("row %i\n", row);
-          col = 0;
-          for (; col < mMatrixStrip->mCanvasHeight; col++) {
-
-            uint16_t pixel = outputBuff[ptrIndex--];
+            uint16_t pixel = outputBuff[ptrIndex++];
             // Color separation based off : https://stackoverflow.com/questions/38557734/how-to-convert-16-bit-hex-color-to-rgb888-values-in-c
             uint8_t r = (pixel & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
             uint8_t g = (pixel & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
             uint8_t b = (pixel & 0x1F) << 3;         // ............bbbbb -> bbbbb000
 
-            mMatrixStrip->GetRenderCanvas()->SetPixel(row, col, r, g, b);
+            mMatrixStrip->GetRenderCanvas()->SetPixel(x, y, r, g, b);
           }
 
         }
 
+//        const int width = mMatrixStrip->GetRenderCanvas()->width();
+//        const int height =  mMatrixStrip->GetRenderCanvas()->height();
+//
+//        mMatrixStrip->GetRenderCanvas()->Fill(0,0,0);
+//
+//        nX++;
+//
+//        if (nX > width) {
+//          nX = 0;
+//          nY++;
+//          if (nY > height) {
+//            nY = 0;
+//          }
+//        }
 
-//        if ((mFrameCount % 10) == 0) printf("%i\n",mFrameCount);
+        mMatrixStrip->GetRenderCanvas()->SetPixel(nX, nY, random() & 0xFF, random() & 0xFF, random() & 0xFF);
+//        if ((mFrameCount % 10) == 0) {
+//          printf("width %i, height %i\n", width, height);
+//          printf("%i\n",mFrameCount);
+//        }
         mMatrixStrip->mFrameCount++;
         break;
       }
