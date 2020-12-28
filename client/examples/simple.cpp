@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 
   NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(file);
 
-  displayConfig.Dump();
+  displayConfig.Describe();
 
   signal(SIGTERM, InterruptHandler);
   signal(SIGINT, InterruptHandler);

@@ -111,7 +111,6 @@ public:
     }
 
     if (mSNow < mSNext) {
-      printf("sleeping %i\n", (mSNext - mSNow) * 1000);
       usleep((mSNext - mSNow) * 1000);
       mSNow = Milliseconds();
     }

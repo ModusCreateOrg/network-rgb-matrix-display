@@ -29,7 +29,8 @@ public:
   FrameCanvas *mDisplayCanvas;
   volatile bool mShouldRun;
 
-
+  bool mShouldClearBuffers;
+  uint16_t mClearBufferDelay;
 
 
 public:
@@ -60,20 +61,17 @@ public:
 
 
   void ClearBuffers() {
-    printf("%s %i\n", __FUNCTION__, mFrameCount); fflush(stdout);
+    printf("\n%s %i\n", __FUNCTION__, mFrameCount); fflush(stdout);
 
     LockMutex();
     mCanvas1->Fill(0,0,0);
     mCanvas2->Fill(0,0,0);
-    mFrameCount++;
     UnlockMutex();
+    mFrameCount++;
   }
 
   FrameCanvas *GetRenderCanvas() {
     return mRenderCanvas;
-  }
-  FrameCanvas *GetDisplayCanvas() {
-    return mDisplayCanvas;
   }
 
   void Describe();
@@ -85,7 +83,6 @@ private:
 
   RGBMatrix *const mMatrix;
   pthread_mutex_t mMutex;
-
 };
 
 

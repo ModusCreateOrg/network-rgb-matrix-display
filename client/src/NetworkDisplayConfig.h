@@ -42,7 +42,7 @@ typedef struct NetworkDisplayConfig {
   }
 
 
-  void Dump() {
+  void Describe() {
     printf("NetworkDisplayConfig: \n");
 
     printf("\tframeRate: %i\n", frameRate);

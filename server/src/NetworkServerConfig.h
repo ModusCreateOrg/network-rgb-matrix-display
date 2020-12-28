@@ -16,6 +16,9 @@ public:
 
       auto *reader = new INIReader(aFile);
 
+      serverConfig->autoClearDisplay = (bool)reader->GetBoolean("general", "auto_clear_display", true);
+      serverConfig->autoClearDelay = (bool)reader->GetInteger("general", "auto_clear_delay", 5000);
+
       serverConfig->singlePanelWidth  = (int)reader->GetInteger("matrix_dimensions", "width", 0);
       serverConfig->singlePanelHeight  = (int)reader->GetInteger("matrix_dimensions", "height", 0);
       serverConfig->numPanelsWide = (int)reader->GetInteger("segment_info", "panels_wide", 0);
@@ -81,6 +84,10 @@ public:
   int numPanelsTall;
   int segmentId;
   int incomingPort;
+
+  bool autoClearDisplay;
+  uint16_t autoClearDelay;
+
 //  int totalSinglePanelSize;
   int totalPixels;
   unsigned short port;

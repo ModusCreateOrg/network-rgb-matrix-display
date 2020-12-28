@@ -56,7 +56,7 @@ void interrupterThread() {
 
         server->mAverage = 0;
         retries = 0;
-        if (matrixStrip) {
+        if (matrixStrip && matrixStrip->mShouldClearBuffers) {
           matrixStrip->ClearBuffers();
         }
       }
@@ -64,7 +64,7 @@ void interrupterThread() {
     }
 
     priorAverage = server->mAverage;
-    usleep(500000);
+    usleep(matrixStrip->mClearBufferDelay);
   }
 }
 
@@ -117,6 +117,8 @@ void start_matrix(NetworkServerConfig *aServerConfig) {
 
   matrixStrip = new MatrixSegment(matrix);
   matrixStrip->mTotalPixels = aServerConfig->totalPixels;
+  matrixStrip->mShouldClearBuffers = aServerConfig->autoClearDisplay;
+  matrixStrip->mClearBufferDelay = aServerConfig->autoClearDelay;
 
   printf("matrixStrip->Start()\n"); fflush(stdout);
   matrixStrip->Start();

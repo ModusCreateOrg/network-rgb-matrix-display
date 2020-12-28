@@ -128,9 +128,6 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 //        mMatrixStrip->GetRenderCanvas()->Fill(r,g,b);
 //        mMatrixStrip->mFrameCount++;
 //
-//        break;
-
-
 
 
 //
@@ -160,7 +157,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
         uint16_t *outputBuff = data;
         int ptrIndex = 0;
         int y = 0;
-        for (; y < mMatrixStrip->GetRenderCanvas()->height(); y++) {
+        for (; y < height; y++) {
 
           for (int x = 0; x < width ; x++) {
             uint16_t pixel = outputBuff[ptrIndex++];
@@ -173,27 +170,6 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
           }
         }
 
-//        const int width = mMatrixStrip->GetRenderCanvas()->width();
-//        const int height =  mMatrixStrip->GetRenderCanvas()->height();
-//
-//        mMatrixStrip->GetRenderCanvas()->Fill(0,0,0);
-//
-//        nX++;
-//
-//        if (nX > width) {
-//          nX = 0;
-//          nY++;
-//          if (nY > height) {
-//            nY = 0;
-//          }
-//        }
-
-//        mMatrixStrip->GetRenderCanvas()->SetPixel(nX, nY, random() & 0xFF, random() & 0xFF, random() & 0xFF);
-//        mMatrixStrip->GetRenderCanvas()->SetPixel(nX, nY, 0,0,0);
-//        if ((mFrameCount % 10) == 0) {
-//          printf("width %i, height %i\n", width, height);
-//          printf("%i\n",mFrameCount);
-//        }
         mMatrixStrip->mFrameCount++;
         break;
       }
