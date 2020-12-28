@@ -31,7 +31,6 @@ void interrupterThread() {
   }
 }
 
-uint16_t color = random() % UINT16_MAX;
 
 int main(int argc, char* argv[]) {
 
@@ -52,10 +51,8 @@ int main(int argc, char* argv[]) {
 
   displayConfig.Dump();
 
-
   signal(SIGTERM, InterruptHandler);
   signal(SIGINT, InterruptHandler);
-
 
   NetworkDisplay *networkDisplay = new NetworkDisplay(displayConfig);
 
@@ -78,10 +75,12 @@ int main(int argc, char* argv[]) {
 //  }
 
 //  uint16_t width = networkDisplay->
-  uint16_t position = 0;
-  color = 0;
+  uint16_t nY = 0;
+  uint16_t nX = 0;
+  uint16_t color = random() % UINT16_MAX;
+
   while (! interrupt_received) {
-//    color++;// random() & UINT16_MAX;
+    color++;// random() & UINT16_MAX;
 //    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
     uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
     bzero(inputBuffer, networkDisplay->GetInputBufferSize());
@@ -89,28 +88,41 @@ int main(int argc, char* argv[]) {
 //    printf("Color %i\n", color);
 //
 
-    position++;
-    if (position > networkDisplay->GetInputScreenHeight()) {
-      position = 0;
+    const uint16_t  screenWidth = networkDisplay->GetOutputScreenWidth(),
+                    screenHeight = networkDisplay->GetInputScreenHeight();
+
+
+    if (nX > screenWidth) {
+      nX = 0;
+      nY++;
+      if (nY > screenHeight) {
+        nY = 0;
+      }
     }
+
+    inputBuffer[nX + (nY * screenWidth)] = color;
+
+
+    nX++;
+
+
+//    printf("nX(%i) nY(%i)\n", nX, nY);
 
 
     uint16_t width = networkDisplay->GetOutputScreenWidth(),
              height = networkDisplay->GetInputScreenHeight();
-//    printf("width = %i\n", width);
-    for (uint16_t i = 0; i < width; i++) {
-      inputBuffer[i * 4] = color;
-    }
-//      inputBuffer[position] = color;
+//    for (uint16_t i = 0; i < width; i++) {
+//      inputBuffer[i] = color;
+//    }
 
-//    memset(inputBuffer, color++, networkDisplay->GetInputBufferSize());
+//    memset(inputBuffer, color, networkDisplay->GetInputBufferSize());
 
 //    for (unsigned short z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
 //      inputBuffer[z] = random() & UINT16_MAX;
 //    }
 //    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
     networkDisplay->Update();
-//    usleep(10000);
+//    usleep(10000 * 10);
   }
 
 

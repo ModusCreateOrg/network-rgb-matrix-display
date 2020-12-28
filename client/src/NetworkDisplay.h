@@ -42,14 +42,19 @@ public:
   void WritePixel(uint16_t index, uint16_t color);
 
   void SwapBuffers() {
+    LockMutex();
     mCurrInBuffer = (mCurrInBuffer == mInputBuffer1) ? mInputBuffer2 : mInputBuffer1;
     mCurrOutBuffer = (mCurrOutBuffer == mOutputBuffer1) ? mOutputBuffer2 : mOutputBuffer1; // Goes to matrix
+    UnlockMutex();
   }
 
   uint16_t GetFrameCount() {
     return mFrameCount;
   }
 
+  void Clear(uint16_t aColor = 0) {
+//    memset(GetInputBuffer(), GetInputBufferSize(), aColor);
+  }
 
 public:
 
@@ -106,6 +111,7 @@ public:
     }
 
     if (mSNow < mSNext) {
+      printf("sleeping %i\n", (mSNext - mSNow) * 1000);
       usleep((mSNext - mSNow) * 1000);
       mSNow = Milliseconds();
     }
@@ -134,9 +140,6 @@ private:
   NetworkDisplayConfig mConfig{};
 
   int mFrameRate;
-  uint16_t mScreenWidth{};
-  uint16_t mScreenHeight{};
-
 
   void InitNetworkSegments();
 

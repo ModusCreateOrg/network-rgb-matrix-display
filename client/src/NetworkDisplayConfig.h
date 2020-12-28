@@ -19,14 +19,12 @@ typedef struct {
 typedef struct NetworkDisplayConfig {
   uint16_t inputScreenWidth;
   uint16_t inputScreenHeight;
-  size_t   inputBufferSize;
 
   uint16_t outputScreenWidth;
   uint16_t outputScreenHeight;
 
   uint16_t singlePanelWidth;
   uint16_t singlePanelHeight;
-
 
 
   uint16_t numberSegments;
@@ -50,7 +48,6 @@ typedef struct NetworkDisplayConfig {
     printf("\tframeRate: %i\n", frameRate);
     printf("\tinputStreamWidth: %i\n", inputScreenWidth);
     printf("\tinputStreamHeight: %i\n", inputScreenHeight);
-    printf("\tinputBufferSize: %lu\n", inputBufferSize);
 
     printf("\toutputScreenWidth: %i\n", outputScreenWidth);
     printf("\toutputScreenHeight: %i\n", outputScreenHeight);

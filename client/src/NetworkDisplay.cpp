@@ -39,7 +39,7 @@ NetworkDisplay::NetworkDisplay(NetworkDisplayConfig config) {
   mOutputScreenWidth  = config.outputScreenWidth;
   mOutputScreenHeight = config.outputScreenHeight;
 
-//  mTotalOutputPixels = mOutputScreenWidth * mOutputScreenHeight;
+  mTotalOutputPixels = mOutputScreenWidth * mOutputScreenHeight;
   mOutputBufferSize = mTotalOutputPixels * sizeof(uint16_t);
   mOutputBuffer1 = (uint16_t *)malloc(mOutputBufferSize);
   mOutputBuffer2 = (uint16_t *)malloc(mOutputBufferSize);
@@ -115,14 +115,22 @@ void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
 
       segment->LockMutex();
 //      bzero(segment->GetInputBuffer(), segment->mTotalBytes);
-      uint16_t startX = segmentIdx * segment->mSegmentWidth;
 
-      for (uint16_t y = 0; y < segment->mSegmentHeight; y++) {
-        uint16_t *screenBuffer = &mCurrOutBuffer[(y * smallerSceen) + (startX)];
-        uint16_t *segmentBuffer = &segment->GetInputBuffer()[y * segment->mSegmentWidth];
+//        if (segment->mSegmentWidth == mOutputScreenWidth) {
+//          memcpy(segment->GetInputBuffer(), mCurrOutBuffer, segment->mTotalBytes);
+//        }
+//        else {
+          uint16_t startX = segmentIdx * segment->mSegmentWidth;
 
-        memcpy(segmentBuffer, screenBuffer, segment->mSegmentWidth * sizeof(uint16_t));
-      }
+          const size_t numBytes = segment->mSegmentWidth * sizeof(uint16_t);
+
+          for (uint16_t y = 0; y < segment->mSegmentHeight; y++) {
+            uint16_t *screenBuffer = &mCurrOutBuffer[(y * smallerSceen) + (startX)];
+            uint16_t *segmentBuffer = &segment->GetInputBuffer()[y * segment->mSegmentWidth];
+
+            memcpy(segmentBuffer, screenBuffer, numBytes);
+          }
+//        }
 
 //      memset(segment->GetInputBuffer(), segment->mTotalBytes, random() & UINT16_MAX);
 
@@ -139,7 +147,6 @@ void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
 }
 //uint3232_t  color = 0;
 void NetworkDisplay::Update() {
-//  SwapBuffers();
 //  printf("frame  %i\n", mFrameCount);
   LockMutex();
 
@@ -154,6 +161,7 @@ void NetworkDisplay::Update() {
   UnlockMutex();
 
   mFrameCount++;
+//  SwapBuffers();
   NextFrameDelay();
 }
 
