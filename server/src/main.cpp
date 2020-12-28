@@ -52,7 +52,7 @@ void interrupterThread() {
     if (server->mAverage == priorAverage) {
       retries++;
       if (retries > 4) {
-        printf("\n**CLEAR BUFFERS!! retries=%i\n",retries);
+//        printf("\n**CLEAR BUFFERS!! retries=%i\n",retries);
 
         server->mAverage = 0;
         retries = 0;
@@ -156,8 +156,7 @@ int main(int argc, char* argv[]) {
 
 
   while (!interrupt_received) {
-//    printf("Main sleeping\n");fflush(stdout);
-    sleep(1); // Time doesn't really matter. The syscall will be interrupted.
+    sleep(1); // Time doesn't really matter.
   }
   printf("\n");fflush(stdout);
 

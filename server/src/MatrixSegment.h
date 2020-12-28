@@ -61,7 +61,7 @@ public:
 
 
   void ClearBuffers() {
-    printf("\n%s %i\n", __FUNCTION__, mFrameCount); fflush(stdout);
+//    printf("\n%s %i\n", __FUNCTION__, mFrameCount); fflush(stdout);
 
     LockMutex();
     mCanvas1->Fill(0,0,0);
