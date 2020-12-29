@@ -45,12 +45,7 @@ SegmentClient::SegmentClient(struct SegmentClientConfig config) {
   printf("SegmentClient %s (id = %i)\n", mDestinationIP, mSegmentId);
 }
 
-//uint16_t  color = 0;
-float segmentColor = 0;
 void SegmentClient::SendDataThread(SegmentClient *mySegment) {
-//  if (mSegmentId != 1) {
-//    return;
-//  }
 
   uint16_t currentFrame = 0;
 
@@ -58,8 +53,6 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
 
   while (mySegment->GetThreadRunning()) {
-//    printf("segment %i :: SendData()\n", mSegmentId);
-    segmentColor += .001f;
 
     if (mySegment->GetFrameCount() == currentFrame) {
       usleep(50);
@@ -67,9 +60,6 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
     }
 
     try {
-//      printf("SegmentClient::%s %i %s %s\n", __FUNCTION__, mSegmentId, mDestinationIP, mDestinationPort);
-//      printf("mTotalBytes %lu\n", mySegment->mTotalBytes);
-//      fflush(stdout);
 
       boost::asio::io_service io_service;
 
@@ -85,7 +75,6 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
       mySegment->UnlockMutex();
 
       size_t numBytesWritten = boost::asio::write(s, boost::asio::buffer(data, mySegment->mTotalBytes));
-//      printf("numBytesWritten = %lu, color = %i\n", numBytesWritten, data[0]);fflush(stdout);
 
       char reply[10];
       size_t reply_length = boost::asio::read(s,boost::asio::buffer(reply, 1));
@@ -109,9 +98,6 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
 
 void SegmentClient::StartThread() {
-//  if (mSegmentId != 0) {
-//    return;
-//  }
   mThreadRunning = true;
   mThread = std::thread(&SegmentClient::SendDataThread, this, this);
   mThread.detach();
@@ -127,13 +113,10 @@ void SegmentClient::StopThread() {
 }
 
 void SegmentClient::LockMutex() {
-//  printf("%i SegmentClient::%s %p\n", mSegmentId, __FUNCTION__, &mMutex);
   pthread_mutex_lock(&mMutex);
 }
 
 void SegmentClient::UnlockMutex() {
-//  printf("SegmentClient::%s\n", __FUNCTION__);
-
   pthread_mutex_unlock(&mMutex);
 }
 
