@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.17)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake.files")
 
 project(network-display-client)
@@ -48,17 +48,37 @@ else()
     SET(ADDITIONAL_LIBRARIES "")
 endif()
 
-set(EXECUTABLE_NAME "draw-with-sdl2")
+set(EXECUTABLE_NAME "draw-mp4")
+
+pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+    libavdevice
+    libavfilter
+    libavformat
+    libavcodec
+    libswresample
+    libswscale
+    libavutil
+)
+MESSAGE("YO ->" ${LIBAV_LINK_LIBRARIES})
+SET(ADDITIONAL_LIBRARIES -L/usr/local/lib ${SDL2_LIBRARIES})
 
 add_executable(${PROJECT_NAME} examples/${EXECUTABLE_NAME}.cpp ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${ADDITIONAL_LIBRARIES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${ADDITIONAL_LIBRARIES}  ${LIBAV_LINK_LIBRARIES})
 
+#TARGET_LINK_LIBRARIES(${PROJECT_NAME} )
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
     ${CMAKE_SOURCE_DIR}/examples/${EXECUTABLE_NAME}.ini
     ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE_NAME}.ini
+)
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/examples/modite-adventure.mp4
+    ${CMAKE_CURRENT_BINARY_DIR}/modite-adventure.mp4
 )
 
 
