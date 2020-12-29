@@ -1,4 +1,3 @@
-
 #undef __USE_SDL2_VIDEO__
 
 
@@ -38,8 +37,6 @@ void interrupterThread() {
 
 int main(int argc, char* argv[]) {
 
-//
-//
 //  for (int i = 0; i < argc; i++) {
 //    printf("arg %i\t%s\n", i, argv[i]);
 //  };
@@ -63,14 +60,10 @@ int main(int argc, char* argv[]) {
   const uint16_t screenWidth = networkDisplay->GetOutputScreenWidth(),
                  screenHeight = networkDisplay->GetOutputScreenHeight();
 
-
+  // Detach the interrupter thread (handles CTRL+C)
   std::thread(interrupterThread).detach();
 
-  uint16_t nY = 0;
-  uint16_t nX = 0;
-  uint16_t color = 0;
-
-
+  // Create the SDL2 RGB Surface with 16bit color depth
   SDL_Surface *surface = SDL_CreateRGBSurface(
     0,
     networkDisplay->GetOutputScreenWidth(),
@@ -83,7 +76,7 @@ int main(int argc, char* argv[]) {
   );
 
 
-  // Exit the program if we screwed up.
+  // Exit the program if we can't create the SDL2 surface
   if(surface == NULL) {
     fprintf(stderr, "CreateRGBSurface failed: %s\n ", SDL_GetError());
     exit(1);
@@ -92,35 +85,45 @@ int main(int argc, char* argv[]) {
   // Create SDL Software Renderer
   SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(surface);
 
+  int y = 0;
+  uint16_t color = 0;
+  int direction = 1;
+
+  // Loop while we have not been interrupted.
+  // This will draw a line for the entire width of the screen and bounce it down and up again.
   while (! interrupt_received) {
     color++;
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0,0);
+    // Clear the screen (fill the buffer with black)
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
+
+    // Draw random RGB values for
     SDL_SetRenderDrawColor(renderer, random() & 0xFF, random() & 0xFF, random() & 0xFF,0);
 
-    SDL_RenderDrawLine(renderer, 0, nY, screenWidth, nY);
+    SDL_RenderDrawLine(renderer, 0, y, screenWidth, y);
 
-    nY++;
-    if (nY > screenHeight) {
-      nY = 0;
+    y += direction;
+
+    if (y > screenHeight) {
+      direction = -1;
+      y = screenHeight;
     }
 
+    if (y < 0) {
+      direction = 1;
+      y = 0;
+    }
 
     uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
     memcpy(inputBuffer, surface->pixels, networkDisplay->GetInputBufferSize());
 
-    // Fills the screen with color. that's it.
-//    memset(inputBuffer, color, networkDisplay->GetInputBufferSize());
-
-    nX++;
 
     networkDisplay->Update();
   }
 
-
+  delete surface;
   delete networkDisplay;
-
 
   return 0;
 }

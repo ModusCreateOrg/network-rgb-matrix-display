@@ -1,4 +1,3 @@
-
 #undef __USE_SDL2_VIDEO__
 
 
@@ -37,14 +36,16 @@ int main(int argc, char* argv[]) {
     printf("arg %i\t%s\n", i, argv[i]);
   };
 
+  // Exit if we have not specified an INI file
   if (argc < 2) {
     fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
     exit(127);
   }
+
   NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(argv[2]);
 
 
-//  const char *file = "simple.ini"; // This is used for debugging within CLion
+//  const char *file = "direct-draw-on-buffer.ini"; // This is used for debugging within CLion
 //  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(file);
 
   displayConfig.Describe();

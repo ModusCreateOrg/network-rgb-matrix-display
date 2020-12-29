@@ -48,16 +48,18 @@ else()
     SET(ADDITIONAL_LIBRARIES "")
 endif()
 
+set(EXECUTABLE_NAME "draw-with-sdl2")
 
-add_executable(${PROJECT_NAME} examples/draw-with-sdl2.cpp ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} examples/${EXECUTABLE_NAME}.cpp ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${ADDITIONAL_LIBRARIES})
 
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_SOURCE_DIR}/examples/draw-with-sdl2.ini
-    ${CMAKE_CURRENT_BINARY_DIR}/draw-with-sdl2.ini)
+    ${CMAKE_SOURCE_DIR}/examples/${EXECUTABLE_NAME}.ini
+    ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE_NAME}.ini
+)
 
 
 
