@@ -1,8 +1,12 @@
 #undef __USE_SDL2_VIDEO__
-
+// This example doesn't work just yet.
 //FFMPEG
+extern "C" {
 #include <libavcodec/avcodec.h>
-#define INBUF_SIZE 4096
+#include <libavformat/avformat.h>
+#define INPUT_BUFER_SIZE 4096
+}
+
 
 #include <stdlib.h>
 #include <string.h>
@@ -32,19 +36,22 @@ void interrupterThread() {
 
 
 // Copied from https://ffmpeg.org/doxygen/trunk/decode_video_8c-example.html (and modified)
-static void decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt, const char *filename) {
+static void decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt) {
   char buf[1024];
-  int ret;
-  ret = avcodec_send_packet(dec_ctx, pkt);
-  if (ret < 0) {
+  int result;
+  result = avcodec_send_packet(dec_ctx, pkt);
+
+  if (result < 0) {
     fprintf(stderr, "Error sending a packet for decoding\n");
     exit(1);
   }
-  while (ret >= 0) {
-    ret = avcodec_receive_frame(dec_ctx, frame);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+  printf("result = %i\n", result);
+
+  while (result >= 0) {
+    result = avcodec_receive_frame(dec_ctx, frame);
+    if (result == AVERROR(EAGAIN) || result == AVERROR_EOF)
       return;
-    else if (ret < 0) {
+    else if (result < 0) {
       fprintf(stderr, "Error during decoding\n");
       exit(1);
     }
@@ -52,7 +59,8 @@ static void decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt, const
     fflush(stdout);
     /* the picture is allocated by the decoder. no need to
        free it */
-    snprintf(buf, sizeof(buf), "%s-%d", filename, dec_ctx->frame_number);
+    snprintf(buf, sizeof(buf), "%d", dec_ctx->frame_number);
+    printf("%s\n", buf);
 //    pgm_save(frame->data[0], frame->linesize[0],
 //             frame->width, frame->height, buf);
   }
@@ -65,12 +73,12 @@ int main(int argc, char* argv[]) {
 //  };
 //
 //  if (argc < 2) {
-//    fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
+//    fprintf(stderr, "Fatal Error! Please specify INI mp4File to open.\n\n");
 //    exit(127);
 //  }
 
-  const char *file = "draw-mp4.ini";
-  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(file);
+  const char *mp4File = "draw-mp4.ini";
+  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(mp4File);
   displayConfig.Describe();
 
   signal(SIGTERM, InterruptHandler);
@@ -84,80 +92,164 @@ int main(int argc, char* argv[]) {
   // Detach the interrupter thread (handles CTRL+C)
   std::thread(interrupterThread).detach();
 
-  const AVCodec *codec;
-  AVCodecParserContext *parser;
-  AVCodecContext *c = NULL;
+  const AVCodec *decoder;
+  AVCodecParserContext *parserContext;
+  AVCodecContext *codecContext = NULL;
 
-  FILE *f;
+  FILE *fileHandler;
   AVFrame *frame;
-  uint8_t inbuf[INBUF_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+  uint8_t inputBuffer[INPUT_BUFER_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
   uint8_t *data;
-  size_t data_size;
+  size_t dataSize;
   int ret;
-  AVPacket *pkt;
-  if (argc <= 2) {
-    fprintf(stderr, "Usage: %s <input file> <output file>\n"
-                    "And check your input file is encoded by mpeg1video please.\n", argv[0]);
-    exit(0);
-  }
-  const char* filename = "modite-adventure.mp4";
+  AVPacket *packet;
+//  if (argc <= 2) {
+//    fprintf(stderr, "Usage: %s <input mp4File> <output mp4File>\n"
+//                    "And check your input mp4File is encoded by mpeg1video please.\n", argv[0]);
+//    exit(0);
+//  }
+  const char* fileName = "modite-adventure.mp4";
 
-  pkt = av_packet_alloc();
-  if (!pkt)
-    exit(1);
-  /* set end of buffer to 0 (this ensures that no overreading happens for damaged MPEG streams) */
-  memset(inbuf + INBUF_SIZE, 0, AV_INPUT_BUFFER_PADDING_SIZE);
-  /* find the MPEG-1 video decoder */
-  codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
-  if (!codec) {
-    fprintf(stderr, "Codec not found\n");
+  AVFormatContext *formatContext = avformat_alloc_context();
+  if (! formatContext) {
+    fprintf(stderr, "Could not allocate formatContext\n");
     exit(1);
   }
-  parser = av_parser_init(codec->id);
-  if (!parser) {
-    fprintf(stderr, "parser not found\n");
+
+  if (avformat_open_input(&formatContext, fileName, NULL, NULL) != 0) {
+    fprintf(stderr, "Could not open %s", fileName);
     exit(1);
   }
-  c = avcodec_alloc_context3(codec);
-  if (!c) {
-    fprintf(stderr, "Could not allocate video codec context\n");
+
+  printf("format %s, duration %lld us, bit_rate %lld", formatContext->iformat->name, formatContext->duration, formatContext->bit_rate);
+
+  if (avformat_find_stream_info(formatContext, NULL) < 0) {
+    fprintf(stderr, "Could not get stream information for %s\n", fileName);
     exit(1);
   }
-  /* For some codecs, such as msmpeg4 and mpeg4, width and height
-     MUST be initialized there because this information is not
-     available in the bitstream. */
-  /* open it */
-  if (avcodec_open2(c, codec, NULL) < 0) {
-    fprintf(stderr, "Could not open codec\n");
+
+
+  fileHandler = fopen(fileName, "rb");
+  if (! fileHandler) {
+    fprintf(stderr, "Could not open %s\n", fileName);
     exit(1);
   }
-  f = fopen(filename, "rb");
-  if (!f) {
-    fprintf(stderr, "Could not open %s\n", filename);
+
+  /*---------------*/
+
+  packet = av_packet_alloc();
+  if (! packet) {
+    fprintf(stderr, "Could not allocate packet!\n");
     exit(1);
   }
+
+  /* set end of buffer to 0 (this ensures that no over-reading happens for damaged MPEG streams) */
+  memset(inputBuffer + INPUT_BUFER_SIZE, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+
+  int videoWidth = formatContext->streams[0]->codecpar->width,
+      videoHeight = formatContext->streams[0]->codecpar->height;
+
+  /* find the MPEG-4 video decoder */
+  decoder = avcodec_find_decoder(formatContext->streams[0]->codecpar->codec_id);
+  if (! decoder) {
+    fprintf(stderr, "Could not allocate decoder!\n");
+    exit(1);
+  }
+
+  parserContext = av_parser_init(decoder->id);
+  if (! parserContext) {
+    fprintf(stderr, "Could not allocate parserContext!\n");
+    exit(1);
+  }
+
+  codecContext = avcodec_alloc_context3(decoder);
+  if (! codecContext) {
+    fprintf(stderr, "Could not allocate video decoder context\n");
+    exit(1);
+  }
+
+
+  if (avcodec_open2(codecContext, decoder, NULL) < 0) {
+    fprintf(stderr, "Could not open decoder\n");
+    exit(1);
+  }
+
   frame = av_frame_alloc();
-  if (!frame) {
+  if (! frame) {
     fprintf(stderr, "Could not allocate video frame\n");
     exit(1);
   }
 
+  frame->nb_samples = codecContext->frame_size;
+  frame->format = codecContext->sample_fmt;
+  frame->channel_layout = codecContext->channel_layout;
 
+
+  uint16_t x = 0;
   // Loop while we have not been interrupted.
   while (! interrupt_received) {
+    x++;
+
+    while (! feof(fileHandler)) {
+      if (interrupt_received) {
+        break;
+      }
+
+      /* read raw data from the input mp4File */
+      dataSize = fread(inputBuffer, 1, INPUT_BUFER_SIZE, fileHandler);
+
+      if (!dataSize)
+        break;
+
+      /* use the parserContext to split the data into frames */
+      data = inputBuffer;
+      int got_image = 0;
+      while (dataSize > 0) {
+        if (interrupt_received) {
+          break;
+        }
+
+        ret = av_parser_parse2(
+          parserContext,
+          codecContext,
+          &packet->data,
+          &packet->size,
+          data,
+          dataSize,
+          AV_NOPTS_VALUE,
+          AV_NOPTS_VALUE,
+          0
+        );
+
+        if (ret < 0) {
+          fprintf(stderr, "Error while parsing\n");
+          exit(1);
+        }
+        data      += ret;
+        dataSize -= ret;
+
+        printf("dataSize %i\n", dataSize);
+
+        if (packet->size) {
+
+          decode(codecContext, frame, packet);
+          networkDisplay->Update();
+        }
+      }
+    }
+
+//    interrupt_received = true;
 
 
 
-
-    networkDisplay->Update();
   }
 
 
-  fclose(f);
-  av_parser_close(parser);
-  avcodec_free_context(&c);
+  fclose(fileHandler);
+  av_parser_close(parserContext);
+  avcodec_free_context(&codecContext);
   av_frame_free(&frame);
-  av_packet_free(&pkt);
+  av_packet_free(&packet);
 
   delete networkDisplay;
 
