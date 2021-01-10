@@ -56,7 +56,6 @@ NetworkServer::NetworkServer(NetworkServerConfig *config) {
   mMatrixStrip = config->matrixStripInstance;
 
   mPort = config->port;
-  printf("IP is %s\n", config->ip);
   fflush(stdout);
   mIP = strdup(config->ip);
 
@@ -67,6 +66,8 @@ NetworkServer::NetworkServer(NetworkServerConfig *config) {
 }
 
 uint16_t nColor = 0;
+int nX = 0;
+int nY = 0;
 
 void NetworkServer::ReceiveDataThread(tcp::socket sock) {
   int numBytesReceived = 0;
@@ -75,23 +76,26 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
   volatile clock_t start = 0;
   volatile clock_t end = 0;
 
-  static uint16_t data[32768];
+  // 32768 = ((NumPixelsWide * NmPixelsTall) * NumPixelsInSegment) * SizeOf(uint16_t)
+  //       = ((64 * 64) * 4) * 2
+//  static uint16_t data[32768];
 //  memset(data,0,mTotalBytes);
-//  auto *data = (uint16_t *)malloc(mTotalBytes);
+  auto *data = (uint16_t *)malloc(mTotalBytes);
+  bzero(data, mTotalBytes);
   const char *returnData = "K";
 
   while (GetThreadRunning()) {
-//    nColor = random() & UINT16_MAX;
+    nColor = random() & UINT16_MAX;
 
     try {
       nColor++;
       start = clock();
 
       boost::system::error_code error;
-      size_t length = boost::asio::read(sock, boost::asio::buffer(&data, mTotalBytes), boost::asio::transfer_exactly(mTotalBytes), error);
+      size_t length = boost::asio::read(sock, boost::asio::buffer(data, mTotalBytes), boost::asio::transfer_exactly(mTotalBytes), error);
 
       numBytesReceived += length;
-
+//      printf("numBytesReceived %i\n", numBytesReceived);
       // Ended early! No bueno!
       if (error == boost::asio::error::eof){
         printf("Eof\n"); fflush(stdout);
@@ -106,10 +110,10 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 
 
 
+
       // this thing re-orients the data so that the pixels are mapped vertically
       if (numBytesReceived == mTotalBytes) {
         end = clock();
-
         mNumberSamples++;
         double delta = (end - start);
         mTotalDelta += delta;
@@ -123,32 +127,48 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
 //        mMatrixStrip->GetRenderCanvas()->Fill(r,g,b);
 //        mMatrixStrip->mFrameCount++;
 //
-//        break;
 
 
-        int ptrIndex = mTotalPixels - 1;
+//
+//        int ptrIndex = mTotalPixels - 1;
+//        uint16_t *outputBuff = data;
+//
+//        int y = 0;
+//        int x = mMatrixStrip->mCanvasWidth - 1;
+//        for (; x > -1 ; x--) {
+////          printf("x %i\n", x);
+//          y = 0;
+//          for (; y < mMatrixStrip->mCanvasHeight; y++) {
+//
+//            uint16_t pixel = outputBuff[ptrIndex--];
+//            // Color separation based off : https://stackoverflow.com/questions/38557734/how-to-convert-16-bit-hex-color-to-rgb888-values-in-c
+//            uint8_t r = (pixel & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
+//            uint8_t g = (pixel & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
+//            uint8_t b = (pixel & 0x1F) << 3;         // ............bbbbb -> bbbbb000
+//
+//            mMatrixStrip->GetRenderCanvas()->SetPixel(x, y, r, g, b);
+//          }
+//
+//        }
+
+        const int width = mMatrixStrip->GetRenderCanvas()->width();
+        const int height =  mMatrixStrip->GetRenderCanvas()->height();
         uint16_t *outputBuff = data;
+        int ptrIndex = 0;
+        int y = 0;
+        for (; y < height; y++) {
 
-        int col = 0;
-        int row = mMatrixStrip->mCanvasWidth - 1;
-        for (; row > -1 ; row--) {
-//          printf("row %i\n", row);
-          col = 0;
-          for (; col < mMatrixStrip->mCanvasHeight; col++) {
-
-            uint16_t pixel = outputBuff[ptrIndex--];
+          for (int x = 0; x < width ; x++) {
+            uint16_t pixel = outputBuff[ptrIndex++];
             // Color separation based off : https://stackoverflow.com/questions/38557734/how-to-convert-16-bit-hex-color-to-rgb888-values-in-c
             uint8_t r = (pixel & 0xF800) >> 8;       // rrrrr... ........ -> rrrrr000
             uint8_t g = (pixel & 0x07E0) >> 3;       // .....ggg ggg..... -> gggggg00
             uint8_t b = (pixel & 0x1F) << 3;         // ............bbbbb -> bbbbb000
 
-            mMatrixStrip->GetRenderCanvas()->SetPixel(row, col, r, g, b);
+            mMatrixStrip->GetRenderCanvas()->SetPixel(x, y, r, g, b);
           }
-
         }
 
-
-//        if ((mFrameCount % 10) == 0) printf("%i\n",mFrameCount);
         mMatrixStrip->mFrameCount++;
         break;
       }
@@ -159,6 +179,7 @@ void NetworkServer::ReceiveDataThread(tcp::socket sock) {
     }
   }
 
+  delete data;
   mFrameCount++;
 }
 

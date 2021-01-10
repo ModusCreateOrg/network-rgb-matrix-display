@@ -24,13 +24,10 @@ SegmentClient::SegmentClient(struct SegmentClientConfig config) {
   mSinglePanelHeight = config.singlePanelHeight;
   mPixelsPerPanel = mSinglePanelWidth * mSinglePanelWidth;
 
-  mSegmentWidth = config.singlePanelWidth * config.numPanelsWide;
-  mSegmentHeight = config.singlePanelHeight * config.numPanelsTall;
+  mSegmentWidth = config.segmentWidth;
+  mSegmentHeight = config.segmentHeight;
 
-  mPanelsWide = config.numPanelsWide;
-  mPanelsTall = config.numPanelsTall;
-
-  mTotalPixels = mPixelsPerPanel * mPanelsWide * mPanelsTall;
+  mTotalPixels = mSegmentWidth * mSegmentHeight;
   mTotalBytes = mTotalPixels * sizeof(uint16_t);
 
 
@@ -48,22 +45,14 @@ SegmentClient::SegmentClient(struct SegmentClientConfig config) {
   printf("SegmentClient %s (id = %i)\n", mDestinationIP, mSegmentId);
 }
 
-//uint16_t  color = 0;
-float segmentColor = 0;
 void SegmentClient::SendDataThread(SegmentClient *mySegment) {
-//  if (mSegmentId != 1) {
-//    return;
-//  }
 
   uint16_t currentFrame = 0;
 
-  uint16_t *data = (uint16_t *)malloc(mySegment->mTotalBytes);
-
+  auto *data = (uint16_t *)malloc(mySegment->mTotalBytes);
 
 
   while (mySegment->GetThreadRunning()) {
-//    printf("segment %i :: SendData()\n", mSegmentId);
-    segmentColor += .001f;
 
     if (mySegment->GetFrameCount() == currentFrame) {
       usleep(50);
@@ -71,9 +60,6 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
     }
 
     try {
-//      printf("SegmentClient::%s %i %s %s\n", __FUNCTION__, mSegmentId, mDestinationIP, mDestinationPort);
-//      printf("mTotalBytes %lu\n", mySegment->mTotalBytes);
-//      fflush(stdout);
 
       boost::asio::io_service io_service;
 
@@ -85,14 +71,10 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
       mySegment->LockMutex();
       uint16_t *sBuffPtr = mySegment->GetOutputBuffer();
 
-//      memset(data, (uint16_t)segmentColor, mySegment->mTotalBytes);
-
-
       memcpy(data, sBuffPtr, mySegment->mTotalBytes);
       mySegment->UnlockMutex();
 
       size_t numBytesWritten = boost::asio::write(s, boost::asio::buffer(data, mySegment->mTotalBytes));
-//      printf("numBytesWritten = %lu, color = %i\n", numBytesWritten, data[0]);fflush(stdout);
 
       char reply[10];
       size_t reply_length = boost::asio::read(s,boost::asio::buffer(reply, 1));
@@ -105,19 +87,17 @@ void SegmentClient::SendDataThread(SegmentClient *mySegment) {
 
     }
     catch (std::exception& e) {
-//      std::cerr << mySegment->mDestinationIP << " " <<  __FUNCTION__ << " Exception: " << e.what() << "\n";
+      std::cerr << mySegment->mDestinationIP << " " <<  __FUNCTION__ << " Exception: " << e.what() << "\n";
     }
   }
 
+  delete data;
   printf("SegmentClient::SendDataThread ended %i\n", mySegment->mSegmentId);
 }
 
 
 
 void SegmentClient::StartThread() {
-//  if (mSegmentId != 0) {
-//    return;
-//  }
   mThreadRunning = true;
   mThread = std::thread(&SegmentClient::SendDataThread, this, this);
   mThread.detach();
@@ -133,13 +113,10 @@ void SegmentClient::StopThread() {
 }
 
 void SegmentClient::LockMutex() {
-//  printf("%i SegmentClient::%s %p\n", mSegmentId, __FUNCTION__, &mMutex);
   pthread_mutex_lock(&mMutex);
 }
 
 void SegmentClient::UnlockMutex() {
-//  printf("SegmentClient::%s\n", __FUNCTION__);
-
   pthread_mutex_unlock(&mMutex);
 }
 
@@ -151,8 +128,6 @@ void SegmentClient::Describe() {
   printf("\tmPixelsPerPanel = %i\n", mPixelsPerPanel);
   printf("\tmSegmentWidth = %i\n", mSegmentWidth);
   printf("\tmSegmentHeight = %i\n", mSegmentHeight);
-  printf("\tmMatricesWide = %i\n", mPanelsWide);
-  printf("\tmMatricesTall = %i\n", mPanelsTall);
   printf("\tmTotalPixels = %i\n", mTotalPixels);
   printf("\tmTotalBytes = %lu\n", mTotalBytes);
   printf("\tmDestinationIP = %s\n", mDestinationIP);

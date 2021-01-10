@@ -1,4 +1,3 @@
-
 #undef __USE_SDL2_VIDEO__
 
 
@@ -31,48 +30,51 @@ void interrupterThread() {
   }
 }
 
-uint16_t color = random() % UINT16_MAX;
 
 int main(int argc, char* argv[]) {
-
   for (int i = 0; i < argc; i++) {
     printf("arg %i\t%s\n", i, argv[i]);
   };
 
+  // Exit if we have not specified an INI file
   if (argc < 2) {
     fprintf(stderr, "Fatal Error! Please specify INI file to open.\n\n");
     exit(127);
   }
 
-  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(argv[1]);
+  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(argv[2]);
 
-  displayConfig.Dump();
 
+//  const char *file = "direct-draw-on-buffer.ini"; // This is used for debugging within CLion
+//  NetworkDisplayConfig displayConfig = NetworkDisplay::GenerateConfig(file);
+
+  displayConfig.Describe();
 
   signal(SIGTERM, InterruptHandler);
   signal(SIGINT, InterruptHandler);
-
 
   NetworkDisplay *networkDisplay = new NetworkDisplay(displayConfig);
 
 
   std::thread(interrupterThread).detach();
 
-  while (! interrupt_received) {
-    color = random() & UINT16_MAX;
-//    printf("input = %lu, output = %lu\n", networkDisplay->GetTotalInputPixels(), networkDisplay->GetTotalOutputPixels());
-    uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
-    memset(inputBuffer, color++, networkDisplay->GetInputBufferSize());
-//    printf("Color %i\n", color);
+  uint16_t nY = 0;
+  uint16_t nX = 0;
+  uint16_t color = 0;
 
-//    for (uint16_t z = 0; z < networkDisplay->GetTotalInputPixels(); z++) {
-//      inputBuffer[z] = color++;
-//    }
-//    printf("color = %i, inputBufferSize = %lu\n", color, networkDisplay->GetInputBufferSize());
+  while (! interrupt_received) {
+    color++;
+    uint16_t *inputBuffer = networkDisplay->GetInputBuffer();
+    // Fills the screen with color. that's it.
+    memset(inputBuffer, color, networkDisplay->GetInputBufferSize());
+
+    nX++;
+
     networkDisplay->Update();
   }
 
 
+  delete networkDisplay;
 
 
   return 0;

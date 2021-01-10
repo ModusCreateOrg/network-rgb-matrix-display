@@ -56,7 +56,7 @@ void interrupterThread() {
 
         server->mAverage = 0;
         retries = 0;
-        if (matrixStrip) {
+        if (matrixStrip && matrixStrip->mShouldClearBuffers == true) {
           matrixStrip->ClearBuffers();
         }
       }
@@ -64,7 +64,7 @@ void interrupterThread() {
     }
 
     priorAverage = server->mAverage;
-    usleep(500000);
+    usleep(matrixStrip->mClearBuffersDelay);
   }
 }
 
@@ -117,6 +117,9 @@ void start_matrix(NetworkServerConfig *aServerConfig) {
 
   matrixStrip = new MatrixSegment(matrix);
   matrixStrip->mTotalPixels = aServerConfig->totalPixels;
+  matrixStrip->mShouldClearBuffers = aServerConfig->autoClearDisplay;
+
+  matrixStrip->mClearBuffersDelay = (unsigned long)aServerConfig->autoClearDelay;
 
   printf("matrixStrip->Start()\n"); fflush(stdout);
   matrixStrip->Start();
@@ -153,8 +156,7 @@ int main(int argc, char* argv[]) {
 
 
   while (!interrupt_received) {
-//    printf("Main sleeping\n");fflush(stdout);
-    sleep(1); // Time doesn't really matter. The syscall will be interrupted.
+    sleep(1); // Time doesn't really matter.
   }
   printf("\n");fflush(stdout);
 

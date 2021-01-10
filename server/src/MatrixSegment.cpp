@@ -13,7 +13,6 @@ MatrixSegment::MatrixSegment(RGBMatrix *m) : ThreadedCanvasManipulator(m), mMatr
   pthread_mutex_init(&mMutex, nullptr);
 #endif
 
-
   mShouldRun = true;
 
   mCanvas1 = m->CreateFrameCanvas();
@@ -79,4 +78,6 @@ void MatrixSegment::Describe() {
 //  printf("\tmTotalPixels = %lu\n", mTotalPixels);
   printf("\tmCanvasWidth = %i\n", mCanvasWidth);
   printf("\tmCanvasHeight = %i\n", mCanvasHeight);
+  printf("\tmShouldClearBuffers = %i\n", mShouldClearBuffers);
+  printf("\tmClearBuffersDelay = %i\n", mClearBuffersDelay);
 }

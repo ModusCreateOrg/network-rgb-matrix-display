@@ -21,12 +21,9 @@ public:
     if (error != 0) {
       fprintf(stderr, "Fatal Error: Can't parse %s. Error code %i.\n", aFile, error);
       fflush(stderr);
-      exit(1);
+      exit(error);
     }
 
-
-    displayConfig.outputScreenWidth = displayConfig.singlePanelWidth * displayConfig.totalPanelsWide;
-    displayConfig.outputScreenHeight = displayConfig.singlePanelHeight * displayConfig.totalPanelsTall;
 
     return displayConfig;
   }
@@ -45,16 +42,34 @@ public:
   void WritePixel(uint16_t index, uint16_t color);
 
   void SwapBuffers() {
+    LockMutex();
     mCurrInBuffer = (mCurrInBuffer == mInputBuffer1) ? mInputBuffer2 : mInputBuffer1;
     mCurrOutBuffer = (mCurrOutBuffer == mOutputBuffer1) ? mOutputBuffer2 : mOutputBuffer1; // Goes to matrix
+    UnlockMutex();
   }
 
   uint16_t GetFrameCount() {
     return mFrameCount;
   }
 
+  void Clear(uint16_t aColor = 0) {
+//    memset(GetInputBuffer(), GetInputBufferSize(), aColor);
+  }
+
 public:
 
+  uint16_t GetOutputScreenWidth() {
+    return mOutputScreenWidth;
+  }
+  uint16_t GetOutputScreenHeight() {
+    return mOutputScreenHeight;
+  }
+  uint16_t GetInputScreenWidth() {
+    return mInputScreenWidth;
+  }
+  uint16_t GetInputScreenHeight() {
+    return mInputScreenHeight;
+  }
   size_t GetTotalInputPixels() {
     return mInputBufferSize;
   }
@@ -66,6 +81,7 @@ public:
   bool GetThreadRunnning() {
     return mThreadRunning;
   }
+
 
   void StartThread() {
     mThreadRunning = true;
@@ -94,12 +110,15 @@ public:
       return;
     }
 
+    mSNext = (mSNext + 1000 / mFrameRate);
+
+
     if (mSNow < mSNext) {
-      usleep((mSNext - mSNow) * 1000);
+      uint16_t sleepTime = (mSNext - mSNow) * 1000;
+      usleep(sleepTime);
       mSNow = Milliseconds();
     }
 
-    mSNext = (mSNext + 1000 / mFrameRate);
   }
 
   uint32_t Milliseconds() {
@@ -120,12 +139,9 @@ public:
 
 
 private:
-  NetworkDisplayConfig mConfig;
+  NetworkDisplayConfig mConfig{};
 
   int mFrameRate;
-  uint16_t mScreenWidth;
-  uint16_t mScreenHeight;
-
 
   void InitNetworkSegments();
 
@@ -156,8 +172,8 @@ private:
   std::vector<SegmentClient *> mSegments;
   uint16_t mFrameCount;
 
-  bool mThreadRunning;
-  pthread_mutex_t mMutex;
+  bool mThreadRunning{};
+  pthread_mutex_t mMutex{};
 
 #ifdef __USE_SDL2_VIDEO__
   SDL2Display *mSDL2Display;

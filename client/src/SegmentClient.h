@@ -7,8 +7,8 @@
 struct SegmentClientConfig {
   uint16_t singlePanelWidth;
   uint16_t singlePanelHeight;
-  uint8_t numPanelsWide;
-  uint8_t numPanelsTall;
+  uint16_t segmentWidth;
+  uint16_t segmentHeight;
   uint8_t segmentId;
   char *destinationIP;
   char *destinationPort;
@@ -20,9 +20,6 @@ public:
   uint16_t mSinglePanelWidth;
   uint16_t mSinglePanelHeight;
   uint16_t mPixelsPerPanel;
-
-  uint16_t mPanelsWide;
-  uint16_t mPanelsTall;
 
   uint16_t mSegmentWidth;
   uint16_t mSegmentHeight;

@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.13)
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake.files")
+cmake_minimum_required(VERSION 3.17)
+#SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake.files")
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake.files)
 
 project(network-display-client)
 
 set(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wno-implicit-exception-spec-mismatch")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wno-implicit-exception-spec-mismatch")
 
 # external libraries
 INCLUDE(FindPkgConfig)
@@ -27,34 +30,57 @@ file(
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src ${INI_LIB_DIR}/)
 
-
-#SET(DEBUG_USE_SDL_WINDOW=true)
-# Direct linux controls (non-SDL2!)
+SET(DEBUG_USE_SDL_WINDOW=true)
 #if (DEFINED ENV{DEBUG_USE_SDL_WINDOW})
 if (1)
-    ADD_COMPILE_DEFINITIONS(__USE_SDL2_VIDEO__=true)
+#    ADD_COMPILE_DEFINITIONS(__USE_SDL2_VIDEO__=true)
     # CMake Module path (additional cmake files via find_package)
 
     FIND_PACKAGE(SDL2 REQUIRED)
-#    FIND_PACKAGE(SDL2_image REQUIRED)
-
     INCLUDE_DIRECTORIES(
         ${SDL2_INCLUDE_DIR}
-        ${SDL2_IMAGE_INCLUDE_DIR}
     )
 
-    SET(ADDITIONAL_LIBRARIES -L/usr/local/lib ${SDL2_LIBRARIES})
+    SET(ADDITIONAL_LIBRARIES  ${SDL2_LIBRARY} )
 
 else()
     SET(ADDITIONAL_LIBRARIES "")
 endif()
 
+set(EXECUTABLE_NAME "draw-bitmap")
+
+#pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+#    libavcodec
+#    libavdevice
+#    libavfilter
+#    libavformat
+#    libavresample
+#    libavutil
+#    libpostproc
+#    libswresample
+#    libswscale
+#)
+#TARGET_LINK_LIBRARIES(${PROJECT_NAME} PkgConfig::LIBAV)
+MESSAGE("SDL2_LIBRARIES " ${ADDITIONAL_LIBRARIES})
+#SET(ADDITIONAL_LIBRARIES -L/usr/local/lib ${SDL2_LIBRARIES})
+
+add_executable(${PROJECT_NAME} examples/${EXECUTABLE_NAME}.cpp ${SOURCE_FILES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${SDL2_LIBRARY})
 
 
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/examples/${EXECUTABLE_NAME}.ini
+    ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE_NAME}.ini
+)
 
-
-add_executable(${PROJECT_NAME} examples/simple.cpp ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${ADDITIONAL_LIBRARIES})
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/examples/image.bmp
+    ${CMAKE_CURRENT_BINARY_DIR}/image.bmp
+)
 
 
 

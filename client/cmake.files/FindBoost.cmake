@@ -32,8 +32,8 @@ case results are reported in variables::
                            target_link_libraries debug/optimized keywords)
   Boost_VERSION          - BOOST_VERSION value from boost/version.hpp
   Boost_LIB_VERSION      - Version string appended to library filenames
-  Boost_MAJOR_VERSION    - Boost major version number (X in X.y.z)
-  Boost_MINOR_VERSION    - Boost minor version number (Y in x.Y.z)
+  Boost_MAJOR_VERSION    - Boost major version number (lineX in lineX.y.z)
+  Boost_MINOR_VERSION    - Boost minor version number (lineY in x.lineY.z)
   Boost_SUBMINOR_VERSION - Boost subminor version number (Z in x.y.Z)
   Boost_VERSION_STRING   - Boost version number in x.y.z format
   Boost_LIB_DIAGNOSTIC_DEFINITIONS (Windows)
