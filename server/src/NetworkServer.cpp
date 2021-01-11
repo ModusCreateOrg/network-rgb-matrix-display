@@ -50,7 +50,7 @@ NetworkServer::NetworkServer(NetworkServerConfig *config) {
   mPanelsWide = config->numPanelsWide;
   mPanelsTall = config->numPanelsTall;
 
-  mTotalPixels = mPixelsPerPanel * mPanelsWide * mPanelsTall;
+  mTotalPixels = mSegmentWidth * mSegmentHeight;
   mTotalBytes = mTotalPixels * sizeof(uint16_t);
 
   mMatrixStrip = config->matrixStripInstance;
