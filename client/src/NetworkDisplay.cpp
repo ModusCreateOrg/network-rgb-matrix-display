@@ -111,6 +111,8 @@ void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
       SegmentClient *segment = remoteDisplay->mSegments[segmentIdx];
 
       segment->LockMutex();
+
+      if (segment->mSegmentWidth > segment->mSegmentHeight) {
         uint16_t startX = segmentIdx * segment->mSegmentWidth;
 
         const size_t numBytes = segment->mSegmentWidth * sizeof(uint16_t);
@@ -121,6 +123,7 @@ void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
 
           memcpy(segmentBuffer, screenBuffer, numBytes);
         }
+      }
 
       segment->UnlockMutex();
       segment->SwapBuffers();
